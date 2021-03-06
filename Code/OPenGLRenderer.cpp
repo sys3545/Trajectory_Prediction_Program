@@ -8,7 +8,7 @@ END_MESSAGE_MAP()
 
 void OPenGLRenderer::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: ¿©±â¿¡ ¸Þ½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº»°ªÀ» È£ÃâÇÕ´Ï´Ù.
+	// TODO: ì—¬ê¸°ì— ë©”ì‹œì§€ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€ ë°/ë˜ëŠ” ê¸°ë³¸ê°’ì„ í˜¸ì¶œí•©ë‹ˆë‹¤.
 	switch (nIDEvent)
 	{
 	case 1:
@@ -44,7 +44,7 @@ bool OPenGLRenderer::CreateGLContext(CRect rect, CWnd* parent)
 	return true;
 }
 
-// ÄÁÅØ½ºÆ® ÃÊ±âÈ­
+// ì»¨í…ìŠ¤íŠ¸ ì´ˆê¸°í™”
 bool OPenGLRenderer::InitContext(CWnd* parent)
 {
 	int bits = 16;
@@ -88,7 +88,7 @@ bool OPenGLRenderer::InitContext(CWnd* parent)
 	return true;
 }
 
-// ÃÊ±â ¾À ÁØºñ
+// ì´ˆê¸° ì”¬ ì¤€ë¹„
 void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 {
 	glClearColor(0.0, 0.0, 1.0, 0.0); //background to clear with.
@@ -109,14 +109,17 @@ void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	glEnable(GL_DEPTH_TEST); // ê¹Šì´ ë²„í¼ë¥¼ ì‚¬ìš©í•  ê²ƒì„ ì•Œë¦¼
+
 	
-	earth = gluNewQuadric(); // Áö±¸ °´Ã¼ ÀÎ½ºÅÏ½º »ý¼º
-	moon = gluNewQuadric(); // ´Þ °´Ã¼ ÀÎ½ºÅÏ½º »ý¼º
+	earth = gluNewQuadric(); // ì§€êµ¬ ê°ì²´ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
+	moon = gluNewQuadric(); // ë‹¬ ê°ì²´ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
+	LoadGLTextures();
 
 	wglMakeCurrent(m_hdc, NULL);
 }
 
-// ÃÊ±â ¼³Á¤ ÀÛ¾÷
+// ì´ˆê¸° ì„¤ì • ìž‘ì—…
 bool OPenGLRenderer::initAi()
 {
 	wglMakeCurrent(m_hdc, m_hrc);
@@ -133,63 +136,48 @@ bool OPenGLRenderer::initAi()
 	return true;
 }
 
-// ±×¸®±â ¸Þ¼Òµå
+// ê·¸ë¦¬ê¸° ë©”ì†Œë“œ
 int OPenGLRenderer::DrawGLScene()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //¹è°æ Å¬¸®¾î
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // ¹öÆÛ ºñÆ® Å¬¸®¾î (°íÁ¤)
-	glLoadIdentity(); // (°íÁ¤)
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //ë°°ê²½ í´ë¦¬ì–´
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // ë²„í¼ ë¹„íŠ¸ í´ë¦¬ì–´ (ê³ ì •)
+	glLoadIdentity(); // (ê³ ì •)
 
 	// draw
-	glPushMatrix(); // Áö±¸Áß½ÉÁÂÇ¥ Ãß°¡
-	glTranslatef(0.0f, 0.0f, -20.0f); //¿øÁ¡ÀÇ ÀÌµ¿
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà -90µµ È¸Àü( ÀÚÀüÃà ¸ÂÃß±â¿ë )
-	glRotatef(-23.5f, 0.0f, 1.0f, 0.0f); // yÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà -23.5µµ È¸Àü( ÀÚÀüÃà ¸ÂÃß±â¿ë )
+	glPushMatrix(); // ì§€êµ¬ì¤‘ì‹¬ì¢Œí‘œ ì¶”ê°€
+	glTranslatef(0.0f, 0.0f, -20.0f); //ì›ì ì˜ ì´ë™
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• -90ë„ íšŒì „( ìžì „ì¶• ë§žì¶”ê¸°ìš© )
+	//glRotatef(-23.5f, 0.0f, 1.0f, 0.0f); // yì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• -23.5ë„ íšŒì „( ìžì „ì¶• ë§žì¶”ê¸°ìš© )
 
-	glRotatef(zrot, 0.0f, 0.0f, 1.0f); //È¸Àü º¯È¯ (zÃà) (Áö±¸ ÀÚÀü)
-	gluQuadricDrawStyle(earth, GLU_FILL); // °´Ã¼¸¦ Ã¤¿ì´Â ÇüÅÂ·Î ¼³Á¤
-	glColor3f(0.6f, 0.6f, 1.0f); // »ö ÁöÁ¤
-	gluSphere(earth, 3.0f, 24, 24); // ±¸¸¦ ±×¸²
+	glRotatef(zrot, 0.0f, 0.0f, 1.0f); //íšŒì „ ë³€í™˜ (zì¶•) (ì§€êµ¬ ìžì „)
+	gluQuadricDrawStyle(earth, GLU_FILL); // ê°ì²´ë¥¼ ì±„ìš°ëŠ” í˜•íƒœë¡œ ì„¤ì •
+	glColor3f(1.0f, 1.0f, 1.0f);//ìƒ‰ ì§€ì •
+	gluSphere(earth, 3.3f, 24, 24); // êµ¬ë¥¼ ê·¸ë¦¼
 
-	gluQuadricDrawStyle(earth, GLU_LINE); // ¼±À» ±ß´Â ÇüÅÂ·Î ¼³Á¤
-	glColor3f(0.0f, 0.0f, 1.0f);//»ö ÁöÁ¤
-	gluSphere(earth, 3.1f, 24, 24); // ±¸¸¦ ±×¸²
+	gluQuadricDrawStyle(earth, GLU_LINE); // ì„ ì„ ê¸‹ëŠ” í˜•íƒœë¡œ ì„¤ì •
+	glColor3f(0.2f, 0.2f, 1.0f);//ìƒ‰ ì§€ì •
+	gluSphere(earth, 3.35f, 24, 24); // êµ¬ë¥¼ ê·¸ë¦¼
 
-	// Red coordinate (xÃà ÁÂÇ¥)
-	glColor3f(1, 0, 0);
-	glLineWidth(1.0f);
-	glBegin(GL_LINE_LOOP);
-	glVertex3f(20.0, 0.0, 0.0);
-	glVertex3f(-20.0, 0.0, 0.0);
-	glEnd();
-
-	// Green coordinate (yÃà ÁÂÇ¥)
-	glColor3f(0, 1, 0);
-	glBegin(GL_LINE_LOOP);
-	glVertex3f(0.0, 20.0, 0.0);
-	glVertex3f(0.0, -20.0, 0.0);
-	glEnd();
-
-	// Blue coordinate (zÃà ÁÂÇ¥)
+	// Blue coordinate (zì¶• ì¢Œí‘œ)
 	glColor3f(0, 0, 1);
 	glBegin(GL_LINE_LOOP);
 	glVertex3f(0.0, 0.0, 20.0);
 	glVertex3f(0.0, 0.0, -20.0);
 	glEnd();
-	glPopMatrix(); // Áö±¸ Áß½ÉÁÂÇ¥ Á¦°Å
+	glPopMatrix(); // ì§€êµ¬ ì¤‘ì‹¬ì¢Œí‘œ ì œê±°
 
-	glPushMatrix(); // ´Þ ±Ëµµ¸¦ À§ÇÑ ÁÂÇ¥ Ãß°¡
-	glTranslatef(0.0f, 0.0f, -20.0f); // ¸ÕÀú ¿øÁ¡À» Áö±¸¿Í ¸ÂÃçÁÜ
-	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //È¸Àü º¯È¯ (zÃà) (´Þ °øÀü) , ±×¸®°í È¸ÀüÀ» Àû¿ë
-	glTranslatef(4.0f, 0.0f, 0.0f); // Áö±¸¿ÍÀÇ °Å¸®¸¸Å­ ÀÌµ¿
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà -90µµ È¸Àü( È¸ÀüÃà ¸ÂÃß±â¿ë )
+	glPushMatrix(); // ë‹¬ ê¶¤ë„ë¥¼ ìœ„í•œ ì¢Œí‘œ ì¶”ê°€
+	glTranslatef(0.0f, 0.0f, -20.0f); // ë¨¼ì € ì›ì ì„ ì§€êµ¬ì™€ ë§žì¶°ì¤Œ
+	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //íšŒì „ ë³€í™˜ (zì¶•) (ë‹¬ ê³µì „) , ê·¸ë¦¬ê³  íšŒì „ì„ ì ìš©
+	glTranslatef(7.0f, 0.0f, 0.0f); // ì§€êµ¬ì™€ì˜ ê±°ë¦¬ë§Œí¼ ì´ë™
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• -90ë„ íšŒì „( íšŒì „ì¶• ë§žì¶”ê¸°ìš© )
 	
-	gluQuadricDrawStyle(moon, GLU_FILL); // °´Ã¼¸¦ Ã¤¿ì´Â ÇüÅÂ·Î ¼³Á¤
+	gluQuadricDrawStyle(moon, GLU_FILL); // ê°ì²´ë¥¼ ì±„ìš°ëŠ” í˜•íƒœë¡œ ì„¤ì •
 	glColor3f(0.35f, 0.35f, 0.35f);
-	gluSphere(moon, 0.7f, 12, 12);
-	gluQuadricDrawStyle(moon, GLU_LINE); // ¼±À» ±ß´Â ÇüÅÂ·Î ¼³Á¤
+	gluSphere(moon, 0.3f, 12, 12);
+	gluQuadricDrawStyle(moon, GLU_LINE); // ì„ ì„ ê¸‹ëŠ” í˜•íƒœë¡œ ì„¤ì •
 	glColor3f(0.7f, 0.7f, 0.7f);
-	gluSphere(moon, 0.75f, 12, 12);
+	gluSphere(moon, 0.32f, 12, 12);
 	glPopMatrix();
 
 	
@@ -198,13 +186,13 @@ int OPenGLRenderer::DrawGLScene()
 	zrot += 0.5f; 
 	if (zrot > 359.5f) zrot = 0.0f;
 
-	moon_zrot += 0.5f;
-	if (moon_zrot > 359.5f) moon_zrot = 0.0f;
+	moon_zrot += 1.0f;
+	if (moon_zrot > 359.0f) moon_zrot = 0.0f;
 
 	return TRUE;
 }
 
-// ¾À »èÁ¦
+// ì”¬ ì‚­ì œ
 void OPenGLRenderer::DestroyScene()
 {
 	DestroyWindow();
@@ -215,4 +203,54 @@ void OPenGLRenderer::DestroyScene()
 		wglDeleteContext(m_hrc);
 		m_hrc = NULL;
 	}
+}
+
+AUX_RGBImageRec* OPenGLRenderer::LoadBMPFile(char* filename)
+{
+	FILE* hFile = NULL;
+	if (!filename) return NULL;
+	
+	hFile = fopen(filename, "r");
+	wchar_t wtext[20];
+	mbstowcs(wtext, filename, strlen(filename) + 1);//Plus null
+	LPWSTR ptr = wtext;
+	
+	if (hFile) {
+		fclose(hFile);
+		test = (CString)"STEP2";
+		return auxDIBImageLoad(ptr);  /// ì•ˆë˜ë©´ ì—¬ê¸° í•´ê²°í•„ìš”
+	} 
+
+	return NULL;
+}
+
+int OPenGLRenderer::LoadGLTextures()
+{
+	int Status = FALSE;
+
+	gluQuadricTexture(earth, GL_TRUE); // í…ìŠ¤ì²˜ ë§¤í•‘ ì‚¬ìš©
+	memset(pTextureImage, 0, sizeof(void *) * 1); // í¬ì¸í„° ì´ˆê¸°í™”
+	test = (CString)"STEP1";
+
+	if (pTextureImage[0] = LoadBMPFile("earthbmp.bmp")) {
+		Status = TRUE;
+		glGenTextures(1, &textureID[0]); // í…ìŠ¤ì³ ê°ì²´ ìƒì„±
+		glBindTexture(GL_TEXTURE_2D, textureID[0]); // ìƒíƒœê´€ë¦¬ìžì—ê²Œ [0]ë²ˆì§¸ í…ìŠ¤ì²˜ë¥¼ ë°”ì¸ë”©
+		glTexImage2D(GL_TEXTURE_2D, 0, 3, pTextureImage[0]->sizeX, pTextureImage[0]->sizeY, 0,
+			GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[0]->data);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // ì´ë¯¸ì§€ íŒŒì¼ê³¼ ë¬¼ì²´ì˜ í¬ê¸°ë¥¼ ë§žì¶°ì¤€ë‹¤
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+		glEnable(GL_TEXTURE_2D);
+		test = (CString)"STEP3";
+	}
+
+	//í…ìŠ¤ì²˜ ê³µê°„ë°˜ë‚©
+	if (pTextureImage[0]) {
+		if (pTextureImage[0]->data) {
+			free(pTextureImage[0]->data);
+		}
+		free(pTextureImage[0]);
+	}
+
+	return Status;
 }
