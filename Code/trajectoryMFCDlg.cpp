@@ -1,4 +1,4 @@
-﻿
+
 // trajectoryMFCDlg.cpp: 구현 파일
 //
 
@@ -104,6 +104,7 @@ BOOL CtrajectoryMFCDlg::OnInitDialog()
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	SetWindowText(_T("Trajectory Prediction of Two-Body Problem - SHIM EUN SONG")); // Window title 설정
 	SetBackgroundColor(RGB(255, 255, 255)); // Window 배경색 설정
+	SetTimer(1000, 10, NULL);
 
 	// OpenGL 생성 및 초기화 작업
 	//CRect rectLeft;
@@ -179,6 +180,6 @@ HCURSOR CtrajectoryMFCDlg::OnQueryDragIcon()
 void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-
+	SetDlgItemText(IDC_EDIT1, m_test->test);
 	CDialogEx::OnTimer(nIDEvent);
 }
