@@ -67,6 +67,7 @@ BEGIN_MESSAGE_MAP(CtrajectoryMFCDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON_ADD, &CtrajectoryMFCDlg::OnBnClickedButtonAdd)
 END_MESSAGE_MAP()
 
 
@@ -182,4 +183,21 @@ void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	SetDlgItemText(IDC_EDIT1, m_test->test);
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	xpos = GetDlgItemInt(IDC_EDIT_XPOS); // XPOS 텍스트박스에 적힌 값을 xpos에 저장 
+	ypos = GetDlgItemInt(IDC_EDIT_YPOS);
+	zpos = GetDlgItemInt(IDC_EDIT_ZPOS);
+	
+	m_test->spaceCraft[m_test->numOfCraft].xpos = (GLfloat)xpos; // 포지션값을 해당하는 물체의 정보에 저장
+	m_test->spaceCraft[m_test->numOfCraft].ypos = (GLfloat)ypos;
+	m_test->spaceCraft[m_test->numOfCraft].zpos = (GLfloat)zpos;
+
+	m_test->CreateCraft(m_test->numOfCraft); // 우주물체 생성
+
+	m_test->numOfCraft++; // 개체수 증가
 }
