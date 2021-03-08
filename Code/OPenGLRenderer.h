@@ -8,6 +8,13 @@
 #pragma comment(lib,"GLAUX.LIB")
 #pragma comment(lib,"legacy_stdio_definitions.lib")
 
+typedef struct {
+	GLfloat xpos = 0.0f;
+	GLfloat ypos = 0.0f;
+	GLfloat zpos = 0.0f;
+	GLUquadricObj* craft = NULL;
+}vecInfo_t;
+
 class OPenGLRenderer : public CWnd
 {
 public:
@@ -18,6 +25,7 @@ public:
 	void DestroyScene();
 	int DrawGLScene();				//Here's where we do all the drawing
 	bool initAi();
+	void CreateCraft(int num); // 우주물체 객체를 생성하는 함수
 	
 	// 텍스처 관련 함수
 	AUX_RGBImageRec* LoadBMPFile(char* filename); // 변수에 이미지를 불러오는 함수
@@ -34,8 +42,15 @@ public:
 	GLfloat		moon_xrot = 0;
 	GLfloat		moon_yrot = 0;
 	GLfloat		moon_zrot = 0;
-	GLUquadricObj* earth=NULL; // 지구 객체
-	GLUquadricObj* moon=NULL; // 달 객체
+	GLfloat		moon_xpos = 7.0f; // 지구와 달거리
+	GLfloat		moon_ypos = 0;
+	GLfloat		moon_zpos = 0;
+
+	GLUquadricObj* earth = NULL; // 지구 객체
+	GLUquadricObj* moon = NULL; // 달 객체
+
+	vecInfo_t spaceCraft[5]; // 우주물체 객체
+	int numOfCraft = 0; // 우주물체 갯수
 
 	// 텍스처 관련 변수
 	AUX_RGBImageRec* pTextureImage[1]; // 이미지 파일에 대한 정보를 가지고 있는 배열
@@ -47,7 +62,6 @@ protected:
 	HGLRC m_hrc;                        // OpenGL Rendering Context 
 	HDC m_hdc;
 	CRect m_rect;
-
 
 public:
 	DECLARE_MESSAGE_MAP()
