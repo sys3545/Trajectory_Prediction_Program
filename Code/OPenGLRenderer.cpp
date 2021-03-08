@@ -1,3 +1,4 @@
+
 #include "pch.h"
 #include "OPenGLRenderer.h"
 
@@ -128,10 +129,6 @@ bool OPenGLRenderer::initAi()
 
 	wglMakeCurrent(m_hdc, NULL);
 
-	xrot = 0.0;
-	yrot = 0.0;
-	zrot = 0.0;
-	
 
 	return true;
 }
@@ -166,10 +163,11 @@ int OPenGLRenderer::DrawGLScene()
 	glEnd();
 	glPopMatrix(); // 지구 중심좌표 제거
 
-	glPushMatrix(); // 달 궤도를 위한 좌표 추가
+	glPushMatrix(); // 달 그리기 위한 좌표 추가
 	glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
+	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //회전 변환 (z축) (달 공전) , 그리고 회전을 적용
-	glTranslatef(7.0f, 0.0f, 0.0f); // 지구와의 거리만큼 이동
+	glTranslatef(7.0f, 0.0f, 0.0f); // 지구와의 거리만큼 x축에서 이동
 	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
 	
 	gluQuadricDrawStyle(moon, GLU_FILL); // 객체를 채우는 형태로 설정
@@ -179,6 +177,38 @@ int OPenGLRenderer::DrawGLScene()
 	glColor3f(0.7f, 0.7f, 0.7f);
 	gluSphere(moon, 0.32f, 12, 12);
 	glPopMatrix();
+
+	for (int i = 0; i <= numOfCraft; i++) {
+		if (spaceCraft[i].craft != NULL) {
+			glPushMatrix(); // 우주물체를 그리기위한 좌표 추가
+			glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
+			glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //회전 변환 (z축) (물체의 공전) , 회전속도는 물체의 주기를 2*PI로 나누면 됨 (나중엔 수학식으로 나타내야함)
+			glTranslatef(spaceCraft[i].xpos, 0.0f, 0.0f); // 지구와의 거리만큼 이동 (x좌표)
+			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
+
+			gluQuadricDrawStyle(spaceCraft[i].craft, GLU_FILL); // 객체를 채우는 형태로 설정
+			glColor3f(0.35f, 0.35f, 0.35f);
+			gluSphere(spaceCraft[i].craft, 0.3f, 12, 12);
+			gluQuadricDrawStyle(spaceCraft[i].craft, GLU_LINE); // 선을 긋는 형태로 설정
+			glColor3f(0.7f, 0.7f, 0.7f);
+			gluSphere(spaceCraft[i].craft, 0.32f, 12, 12);
+			glPopMatrix();
+		}
+	}
+
+	/*glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
+	glBegin(GL_LINES);
+	for (GLfloat angle = 0; angle < 360; angle += 1.0f)
+	{
+		moon_xpos = cos(angle) * 7.0f;
+		moon_ypos = sin(angle) * 7.0f;
+		glVertex3f(moon_xpos, moon_ypos, moon_zpos);
+	}
+	glEnd();
+	glPopMatrix();*/
 
 	
 	glFlush();
@@ -218,7 +248,7 @@ AUX_RGBImageRec* OPenGLRenderer::LoadBMPFile(char* filename)
 	if (hFile) {
 		fclose(hFile);
 		test = (CString)"STEP2";
-		return auxDIBImageLoad(ptr);  /// 안되면 여기 해결필요
+		return auxDIBImageLoad(ptr);
 	} 
 
 	return NULL;
@@ -251,6 +281,10 @@ int OPenGLRenderer::LoadGLTextures()
 		}
 		free(pTextureImage[0]);
 	}
-
 	return Status;
+}
+
+// 우주물체를 직접적으로 생성하는 함수
+void OPenGLRenderer::CreateCraft(int num) {
+	spaceCraft[num].craft = gluNewQuadric(); // 물체 객체 인스턴스 생성
 }
