@@ -181,21 +181,33 @@ HCURSOR CtrajectoryMFCDlg::OnQueryDragIcon()
 void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	SetDlgItemText(IDC_EDIT1, m_test->test);
+	CString str;
+	/*if (m_test->numOfCraft >= 1) {
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft)-1].xpos); // float -> CString
+		SetDlgItemText(IDC_EDIT1, str);
+	}*/
+	str.Format(_T("%d"), m_test->deltaTime);
+	SetDlgItemText(IDC_EDIT1, str);
+	
 	CDialogEx::OnTimer(nIDEvent);
 }
-
 
 void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	xpos = GetDlgItemInt(IDC_EDIT_XPOS); // XPOS 텍스트박스에 적힌 값을 xpos에 저장 
-	ypos = GetDlgItemInt(IDC_EDIT_YPOS);
-	zpos = GetDlgItemInt(IDC_EDIT_ZPOS);
-	
-	m_test->spaceCraft[m_test->numOfCraft].xpos = (GLfloat)xpos; // 포지션값을 해당하는 물체의 정보에 저장
-	m_test->spaceCraft[m_test->numOfCraft].ypos = (GLfloat)ypos;
-	m_test->spaceCraft[m_test->numOfCraft].zpos = (GLfloat)zpos;
+	GetDlgItemText(IDC_EDIT_XPOS, xpos); // XPOS 텍스트박스에 적힌 값을 xpos에 저장
+	GetDlgItemText(IDC_EDIT_YPOS, ypos);
+	GetDlgItemText(IDC_EDIT_ZPOS, zpos);
+	GetDlgItemText(IDC_EDIT_XVEL, xvel); // XVEL 텍스트박스에 적힌 값을 xvel에 저장
+	GetDlgItemText(IDC_EDIT_YVEL, yvel);
+	GetDlgItemText(IDC_EDIT_ZVEL, zvel);
+
+	m_test->spaceCraft[m_test->numOfCraft].xpos = (GLfloat)atof((CStringA)xpos); // CString의 xpos를 GLfloat으로 변환하여 저장
+	m_test->spaceCraft[m_test->numOfCraft].ypos = (GLfloat)atof((CStringA)ypos);
+	m_test->spaceCraft[m_test->numOfCraft].zpos = (GLfloat)atof((CStringA)zpos);
+	m_test->spaceCraft[m_test->numOfCraft].xvel = (GLfloat)atof((CStringA)xvel); // Cstring의 xvel을 GLfloat으로 변환하여 저장
+	m_test->spaceCraft[m_test->numOfCraft].yvel = (GLfloat)atof((CStringA)yvel);
+	m_test->spaceCraft[m_test->numOfCraft].zvel = (GLfloat)atof((CStringA)zvel);
 
 	m_test->CreateCraft(m_test->numOfCraft); // 우주물체 생성
 
