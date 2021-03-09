@@ -1,4 +1,3 @@
-
 #include "pch.h"
 #include "OPenGLRenderer.h"
 
@@ -17,6 +16,14 @@ void OPenGLRenderer::OnTimer(UINT_PTR nIDEvent)
 		DrawGLScene();
 		SwapBuffers(m_hdc);
 		wglMakeCurrent(m_hdc, NULL);
+
+		currentTime = glutGet(GLUT_ELAPSED_TIME); // 시간 간격 얻기
+		deltaTime = currentTime - oldTime;
+		oldTime = currentTime;
+
+		if (deltaTime <= 20)
+			Sleep(20 - deltaTime);
+
 		break;
 	default:
 		break;
@@ -115,7 +122,11 @@ void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 	
 	earth = gluNewQuadric(); // 지구 객체 인스턴스 생성
 	moon = gluNewQuadric(); // 달 객체 인스턴스 생성
+	spaceCraft[4].craft = gluNewQuadric();
+	spaceCraft[4].xpos = 5.0f;
+	spaceCraft[4].xvel = -1.0f;
 	LoadGLTextures();
+	oldTime = glutGet(GLUT_ELAPSED_TIME); //oldTime 값은 초기화과정 맨 마지막에 적용
 
 	wglMakeCurrent(m_hdc, NULL);
 }
@@ -128,7 +139,7 @@ bool OPenGLRenderer::initAi()
 	glEnable(GL_LIGHT1);
 
 	wglMakeCurrent(m_hdc, NULL);
-
+	
 
 	return true;
 }
@@ -178,39 +189,66 @@ int OPenGLRenderer::DrawGLScene()
 	gluSphere(moon, 0.32f, 12, 12);
 	glPopMatrix();
 
+
 	for (int i = 0; i <= numOfCraft; i++) {
 		if (spaceCraft[i].craft != NULL) {
 			glPushMatrix(); // 우주물체를 그리기위한 좌표 추가
 			glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
-			glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //회전 변환 (z축) (물체의 공전) , 회전속도는 물체의 주기를 2*PI로 나누면 됨 (나중엔 수학식으로 나타내야함)
-			glTranslatef(spaceCraft[i].xpos, 0.0f, 0.0f); // 지구와의 거리만큼 이동 (x좌표)
+			glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
+
+			glTranslatef(spaceCraft[i].xpos, spaceCraft[i].ypos, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
 
 			gluQuadricDrawStyle(spaceCraft[i].craft, GLU_FILL); // 객체를 채우는 형태로 설정
 			glColor3f(0.35f, 0.35f, 0.35f);
 			gluSphere(spaceCraft[i].craft, 0.3f, 12, 12);
+
 			gluQuadricDrawStyle(spaceCraft[i].craft, GLU_LINE); // 선을 긋는 형태로 설정
 			glColor3f(0.7f, 0.7f, 0.7f);
 			gluSphere(spaceCraft[i].craft, 0.32f, 12, 12);
 			glPopMatrix();
+
+			spaceCraft[i].angle += spaceCraft[i].angleSpeed * time; // 각도 증가
+			if (spaceCraft[i].angle > 359.9f) spaceCraft[i].angle = 0.0f; // 360도 넘으면 0도로 
+
+			spaceCraft[i].xpos = spaceCraft[i].radius * (GLfloat)cos(spaceCraft[i].angle);
+			spaceCraft[i].ypos = spaceCraft[i].radius * (GLfloat)sin(spaceCraft[i].angle);
 		}
 	}
 
-	/*glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
+	glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
+	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
 	glBegin(GL_LINES);
 	for (GLfloat angle = 0; angle < 360; angle += 1.0f)
 	{
-		moon_xpos = cos(angle) * 7.0f;
-		moon_ypos = sin(angle) * 7.0f;
+		moon_xpos = (GLfloat)cos(angle) * 7.0f;
+		moon_ypos = (GLfloat)sin(angle) * 7.0f;
 		glVertex3f(moon_xpos, moon_ypos, moon_zpos);
 	}
 	glEnd();
-	glPopMatrix();*/
+	glPopMatrix();
+	///////
+	glPushMatrix();
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glTranslatef(0.0f, 0.0f, -10.0f); // 먼저 원점을 지구와 맞춰줌
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
+	glTranslatef(spaceCraft[4].xpos, 0.0f, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
+	gluQuadricDrawStyle(spaceCraft[4].craft, GLU_FILL); // 객체를 채우는 형태로 설정
+	glColor3f(0.35f, 0.35f, 0.35f);
+	gluSphere(spaceCraft[4].craft, 0.3f, 12, 12);
 
-	
+	gluQuadricDrawStyle(spaceCraft[4].craft, GLU_LINE); // 선을 긋는 형태로 설정
+	glColor3f(0.7f, 0.7f, 0.7f);
+	gluSphere(spaceCraft[4].craft, 0.32f, 12, 12);
+	glPopMatrix();
+
+	spaceCraft[4].xpos += spaceCraft[4].xvel * 0.01f;
+	if (spaceCraft[4].xpos < 0.0f) spaceCraft[4].xpos = 5.0f;
+	///////
+
 	glFlush();
 
 	zrot += 0.5f; 
@@ -247,7 +285,6 @@ AUX_RGBImageRec* OPenGLRenderer::LoadBMPFile(char* filename)
 	
 	if (hFile) {
 		fclose(hFile);
-		test = (CString)"STEP2";
 		return auxDIBImageLoad(ptr);
 	} 
 
@@ -260,7 +297,6 @@ int OPenGLRenderer::LoadGLTextures()
 
 	gluQuadricTexture(earth, GL_TRUE); // 텍스처 매핑 사용
 	memset(pTextureImage, 0, sizeof(void *) * 1); // 포인터 초기화
-	test = (CString)"STEP1";
 
 	if (pTextureImage[0] = LoadBMPFile("earthbmp.bmp")) {
 		Status = TRUE;
@@ -271,7 +307,6 @@ int OPenGLRenderer::LoadGLTextures()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // 이미지 파일과 물체의 크기를 맞춰준다
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
 		glEnable(GL_TEXTURE_2D);
-		test = (CString)"STEP3";
 	}
 
 	//텍스처 공간반납
