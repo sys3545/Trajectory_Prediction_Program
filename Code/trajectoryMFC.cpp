@@ -1,107 +1,215 @@
-﻿
-// trajectoryMFC.cpp: 애플리케이션에 대한 클래스 동작을 정의합니다.
+
+// trajectoryMFCDlg.cpp: 구현 파일
 //
 
 #include "pch.h"
 #include "framework.h"
 #include "trajectoryMFC.h"
 #include "trajectoryMFCDlg.h"
+#include "afxdialogex.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CtrajectoryMFCApp
+// 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
-BEGIN_MESSAGE_MAP(CtrajectoryMFCApp, CWinApp)
-	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
+class CAboutDlg : public CDialogEx
+{
+public:
+	CAboutDlg();
+
+// 대화 상자 데이터입니다.
+#ifdef AFX_DESIGN_TIME
+	enum { IDD = IDD_ABOUTBOX };
+#endif
+
+	protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
+
+// 구현입니다.
+protected:
+	DECLARE_MESSAGE_MAP()
+};
+
+CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
+{
+}
+
+void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CtrajectoryMFCApp 생성
+// CtrajectoryMFCDlg 대화 상자
 
-CtrajectoryMFCApp::CtrajectoryMFCApp()
+
+
+CtrajectoryMFCDlg::CtrajectoryMFCDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_TRAJECTORYMFC_DIALOG, pParent)
 {
-	// 다시 시작 관리자 지원
-	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+}
 
-	// TODO: 여기에 생성 코드를 추가합니다.
-	// InitInstance에 모든 중요한 초기화 작업을 배치합니다.
+void CtrajectoryMFCDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_STATIC_PICTURE, m_pLeft);
+}
+
+BEGIN_MESSAGE_MAP(CtrajectoryMFCDlg, CDialogEx)
+	ON_WM_SYSCOMMAND()
+	ON_WM_PAINT()
+	ON_WM_QUERYDRAGICON()
+	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON_ADD, &CtrajectoryMFCDlg::OnBnClickedButtonAdd)
+END_MESSAGE_MAP()
+
+
+// CtrajectoryMFCDlg 메시지 처리기
+
+BOOL CtrajectoryMFCDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// 시스템 메뉴에 "정보..." 메뉴 항목을 추가합니다.
+
+	// IDM_ABOUTBOX는 시스템 명령 범위에 있어야 합니다.
+	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+	ASSERT(IDM_ABOUTBOX < 0xF000);
+
+	CMenu* pSysMenu = GetSystemMenu(FALSE);
+	if (pSysMenu != nullptr)
+	{
+		BOOL bNameValid;
+		CString strAboutMenu;
+		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
+		ASSERT(bNameValid);
+		if (!strAboutMenu.IsEmpty())
+		{
+			pSysMenu->AppendMenu(MF_SEPARATOR);
+			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+		}
+	}
+
+	// 이 대화 상자의 아이콘을 설정합니다.  응용 프로그램의 주 창이 대화 상자가 아닐 경우에는
+	//  프레임워크가 이 작업을 자동으로 수행합니다.
+	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
+	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
+
+	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	SetWindowText(_T("Trajectory Prediction of Two-Body Problem - SHIM EUN SONG")); // Window title 설정
+	SetBackgroundColor(RGB(255, 255, 255)); // Window 배경색 설정
+	SetTimer(1000, 10, NULL);
+
+	// OpenGL 생성 및 초기화 작업
+	//CRect rectLeft;
+	int iWidth, iHeight;
+
+	m_pLeft.GetWindowRect(rectLeft);
+	iWidth = rectLeft.Width();
+	iHeight = rectLeft.Height();
+
+	m_test = new OPenGLRenderer;
+	CString className = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_OWNDC, NULL, (HBRUSH)GetStockObject(WHITE_BRUSH), NULL);
+	m_test->CreateEx(0, className, _T("OpenGLCube"), WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, rectLeft, this, 0);
+	m_test->ShowWindow(SW_SHOW);
+
+	m_test->CreateGLContext(rectLeft, this);
+	m_test->PrepareScene(0, 0, iWidth, iHeight); //will show without this but as black & white.
+	m_test->SetTimer(1, 10, 0);
+
+	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+}
+
+void CtrajectoryMFCDlg::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+	{
+		CAboutDlg dlgAbout;
+		dlgAbout.DoModal();
+	}
+	else
+	{
+		CDialogEx::OnSysCommand(nID, lParam);
+	}
+}
+
+// 대화 상자에 최소화 단추를 추가할 경우 아이콘을 그리려면
+//  아래 코드가 필요합니다.  문서/뷰 모델을 사용하는 MFC 애플리케이션의 경우에는
+//  프레임워크에서 이 작업을 자동으로 수행합니다.
+
+void CtrajectoryMFCDlg::OnPaint()
+{
+	if (IsIconic())
+	{
+		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+		
+		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+
+		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		// 아이콘을 그립니다.
+		dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		CDialogEx::OnPaint();
+	}
+}
+
+// 사용자가 최소화된 창을 끄는 동안에 커서가 표시되도록 시스템에서
+//  이 함수를 호출합니다.
+HCURSOR CtrajectoryMFCDlg::OnQueryDragIcon()
+{
+	return static_cast<HCURSOR>(m_hIcon);
 }
 
 
-// 유일한 CtrajectoryMFCApp 개체입니다.
 
-CtrajectoryMFCApp theApp;
-
-
-// CtrajectoryMFCApp 초기화
-
-BOOL CtrajectoryMFCApp::InitInstance()
+void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	// 애플리케이션 매니페스트가 ComCtl32.dll 버전 6 이상을 사용하여 비주얼 스타일을
-	// 사용하도록 지정하는 경우, Windows XP 상에서 반드시 InitCommonControlsEx()가 필요합니다.
-	// InitCommonControlsEx()를 사용하지 않으면 창을 만들 수 없습니다.
-	INITCOMMONCONTROLSEX InitCtrls;
-	InitCtrls.dwSize = sizeof(InitCtrls);
-	// 응용 프로그램에서 사용할 모든 공용 컨트롤 클래스를 포함하도록
-	// 이 항목을 설정하십시오.
-	InitCtrls.dwICC = ICC_WIN95_CLASSES;
-	InitCommonControlsEx(&InitCtrls);
-
-	CWinApp::InitInstance();
-
-
-	AfxEnableControlContainer();
-
-	// 대화 상자에 셸 트리 뷰 또는
-	// 셸 목록 뷰 컨트롤이 포함되어 있는 경우 셸 관리자를 만듭니다.
-	CShellManager *pShellManager = new CShellManager;
-
-	// MFC 컨트롤의 테마를 사용하기 위해 "Windows 원형" 비주얼 관리자 활성화
-	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
-
-	// 표준 초기화
-	// 이들 기능을 사용하지 않고 최종 실행 파일의 크기를 줄이려면
-	// 아래에서 필요 없는 특정 초기화
-	// 루틴을 제거해야 합니다.
-	// 해당 설정이 저장된 레지스트리 키를 변경하십시오.
-	// TODO: 이 문자열을 회사 또는 조직의 이름과 같은
-	// 적절한 내용으로 수정해야 합니다.
-	SetRegistryKey(_T("로컬 애플리케이션 마법사에서 생성된 애플리케이션"));
-
-	CtrajectoryMFCDlg dlg;
-	m_pMainWnd = &dlg;
-	INT_PTR nResponse = dlg.DoModal();
-	if (nResponse == IDOK)
-	{
-		// TODO: 여기에 [확인]을 클릭하여 대화 상자가 없어질 때 처리할
-		//  코드를 배치합니다.
-	}
-	else if (nResponse == IDCANCEL)
-	{
-		// TODO: 여기에 [취소]를 클릭하여 대화 상자가 없어질 때 처리할
-		//  코드를 배치합니다.
-	}
-	else if (nResponse == -1)
-	{
-		TRACE(traceAppMsg, 0, "경고: 대화 상자를 만들지 못했으므로 애플리케이션이 예기치 않게 종료됩니다.\n");
-		TRACE(traceAppMsg, 0, "경고: 대화 상자에서 MFC 컨트롤을 사용하는 경우 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS를 수행할 수 없습니다.\n");
-	}
-
-	// 위에서 만든 셸 관리자를 삭제합니다.
-	if (pShellManager != nullptr)
-	{
-		delete pShellManager;
-	}
-
-#if !defined(_AFXDLL) && !defined(_AFX_NO_MFC_CONTROLS_IN_DIALOGS)
-	ControlBarCleanUp();
-#endif
-
-	// 대화 상자가 닫혔으므로 응용 프로그램의 메시지 펌프를 시작하지 않고  응용 프로그램을 끝낼 수 있도록 FALSE를
-	// 반환합니다.
-	return FALSE;
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	CString str;
+	/*if (m_test->numOfCraft >= 1) {
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft)-1].xpos); // float -> CString
+		SetDlgItemText(IDC_EDIT1, str);
+	}*/
+	str.Format(_T("%d"), m_test->deltaTime);
+	SetDlgItemText(IDC_EDIT1, str);
+	
+	CDialogEx::OnTimer(nIDEvent);
 }
 
+void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	GetDlgItemText(IDC_EDIT_XPOS, xpos); // XPOS 텍스트박스에 적힌 값을 xpos에 저장
+	GetDlgItemText(IDC_EDIT_YPOS, ypos);
+	GetDlgItemText(IDC_EDIT_ZPOS, zpos);
+	GetDlgItemText(IDC_EDIT_XVEL, xvel); // XVEL 텍스트박스에 적힌 값을 xvel에 저장
+	GetDlgItemText(IDC_EDIT_YVEL, yvel);
+	GetDlgItemText(IDC_EDIT_ZVEL, zvel);
+
+	m_test->spaceCraft[m_test->numOfCraft].xpos = (GLfloat)atof((CStringA)xpos); // CString의 xpos를 GLfloat으로 변환하여 저장
+	m_test->spaceCraft[m_test->numOfCraft].ypos = (GLfloat)atof((CStringA)ypos);
+	m_test->spaceCraft[m_test->numOfCraft].zpos = (GLfloat)atof((CStringA)zpos);
+	m_test->spaceCraft[m_test->numOfCraft].xvel = (GLfloat)atof((CStringA)xvel); // Cstring의 xvel을 GLfloat으로 변환하여 저장
+	m_test->spaceCraft[m_test->numOfCraft].yvel = (GLfloat)atof((CStringA)yvel);
+	m_test->spaceCraft[m_test->numOfCraft].zvel = (GLfloat)atof((CStringA)zvel);
+
+	m_test->CreateCraft(m_test->numOfCraft); // 우주물체 생성
+
+	m_test->numOfCraft++; // 개체수 증가
+}
