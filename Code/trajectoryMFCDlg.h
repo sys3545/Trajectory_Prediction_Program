@@ -35,7 +35,9 @@ protected:
 public:
 	CStatic m_pLeft; // picture 객체 변수
 	CRect rectLeft; // picture 사각형 변수
-	int xpos, ypos, zpos; // 입력받을 포지션의 변수
+	CString xpos, ypos, zpos; // 입력받을 포지션의 변수
+	CString xvel, yvel, zvel; // 입력받을 속도의 변수
+	
 	afx_msg void OnTimer(UINT_PTR nIDEvent); // WM_TIMER로 추가한 함수
 	afx_msg void OnBnClickedButtonAdd(); // ADD 버튼이 클릭되면
 };
