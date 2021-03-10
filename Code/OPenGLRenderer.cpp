@@ -1,3 +1,4 @@
+
 #include "pch.h"
 #include "OPenGLRenderer.h"
 
@@ -21,8 +22,8 @@ void OPenGLRenderer::OnTimer(UINT_PTR nIDEvent)
 		deltaTime = currentTime - oldTime;
 		oldTime = currentTime;
 
-		if (deltaTime <= 20)
-			Sleep(20 - deltaTime);
+		if (deltaTime <= 30)
+			Sleep(30 - deltaTime);
 
 		break;
 	default:
@@ -124,10 +125,10 @@ void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 	moon = gluNewQuadric(); // 달 객체 인스턴스 생성
 	spaceCraft[4].craft = gluNewQuadric();
 	spaceCraft[4].xpos = 5.0f;
-	spaceCraft[4].xvel = -1.0f;
+	spaceCraft[4].xvel = -2.5f;
 	LoadGLTextures();
 	oldTime = glutGet(GLUT_ELAPSED_TIME); //oldTime 값은 초기화과정 맨 마지막에 적용
-
+	oldTime2 = glutGet(GLUT_ELAPSED_TIME);
 	wglMakeCurrent(m_hdc, NULL);
 }
 
@@ -245,7 +246,7 @@ int OPenGLRenderer::DrawGLScene()
 	gluSphere(spaceCraft[4].craft, 0.32f, 12, 12);
 	glPopMatrix();
 
-	spaceCraft[4].xpos += spaceCraft[4].xvel * 0.01f;
+	spaceCraft[4].xpos += spaceCraft[4].xvel * 0.0175f; // 이러면 딱 km/s 가 나온다
 	if (spaceCraft[4].xpos < 0.0f) spaceCraft[4].xpos = 5.0f;
 	///////
 
@@ -255,8 +256,13 @@ int OPenGLRenderer::DrawGLScene()
 	if (zrot > 359.5f) zrot = 0.0f;
 
 	moon_zrot += 1.0f;
-	if (moon_zrot > 359.0f) moon_zrot = 0.0f;
-
+	if (moon_zrot > 359.0f) {
+		moon_zrot = 0.0f;
+		currentTime2 = glutGet(GLUT_ELAPSED_TIME); // 시간 간격 얻기
+		deltaTime2 = currentTime2 - oldTime2;
+		oldTime2 = currentTime2; /// 달의 주기 확인 결과( 1 tick = 0.018333 s )
+	}
+	
 	return TRUE;
 }
 
