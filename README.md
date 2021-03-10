@@ -13,3 +13,6 @@ adding spacecraft is possible.
    
 Released version 0.0.4 (2021 03 09) :  
 Time unit problem have to be solved in next version.   
+   
+Released version 0.0.4 (2021 03 10) :   
+we can calculate omega and inclination , Time unit problem was solved (but it's not perfect yet)   
