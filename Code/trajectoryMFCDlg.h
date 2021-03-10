@@ -37,6 +37,10 @@ public:
 	CRect rectLeft; // picture 사각형 변수
 	CString xpos, ypos, zpos; // 입력받을 포지션의 변수
 	CString xvel, yvel, zvel; // 입력받을 속도의 변수
+
+	// 궤도요소 라디안 크기의 임시변수
+	GLfloat radianI = 0.0f;
+	GLfloat radianOmega = 0.0f;
 	
 	afx_msg void OnTimer(UINT_PTR nIDEvent); // WM_TIMER로 추가한 함수
 	afx_msg void OnBnClickedButtonAdd(); // ADD 버튼이 클릭되면
