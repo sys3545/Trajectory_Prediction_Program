@@ -11,8 +11,8 @@
 typedef struct {
 	GLfloat xpos = 0.0f, ypos = 0.0f, zpos = 0.0f;
 	GLfloat xvel = 0.0f, yvel = 0.0f, zvel = 0.0f;
-	GLfloat C1 = 0.0f, C2 = 0.0f, C3 = 0.0f;
-	GLfloat h = 0.0f;
+	GLfloat C1 = 0.0f, C2 = 0.0f, C3 = 0.0f, h = 0.0f;
+	GLfloat i = 0.0f, omega = 0.0f;
 	GLfloat angleSpeed = 36.0f; // angle per t
 	GLfloat angle = 0.0f;
 	GLfloat radius = 7.0f;
@@ -61,6 +61,9 @@ public:
 	int currentTime = 0;
 	int oldTime = 0;
 	int deltaTime = 0;
+	int currentTime2 = 0;
+	int oldTime2 = 0;
+	int deltaTime2 = 0;
 
 	CString test;
 
