@@ -16,3 +16,6 @@ Time unit problem have to be solved in next version.
    
 Released version 0.0.5 (2021 03 10) :   
 we can calculate omega and inclination , Time unit problem was solved (but it's not perfect yet)   
+   
+Released version 0.0.5 (2021 03 14) :   
+Trajectory drawing is done , but f is not perfect yet.   
