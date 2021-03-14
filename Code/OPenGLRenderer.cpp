@@ -152,20 +152,21 @@ int OPenGLRenderer::DrawGLScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 버퍼 비트 클리어 (고정)
 	glLoadIdentity(); // (고정)
 
-	// draw
+	////draw Earth
 	glPushMatrix(); // 지구중심좌표 추가
-	glTranslatef(0.0f, 0.0f, -20.0f); //원점의 이동
+	glTranslatef(0.0f, 0.0f, -30.0f); //원점의 이동
 	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 자전축 맞추기용 )
 	//glRotatef(-23.5f, 0.0f, 1.0f, 0.0f); // y축을 기준으로 좌표축 -23.5도 회전( 자전축 맞추기용 )
 
 	glRotatef(zrot, 0.0f, 0.0f, 1.0f); //회전 변환 (z축) (지구 자전)
 	gluQuadricDrawStyle(earth, GLU_FILL); // 객체를 채우는 형태로 설정
-	glColor3f(1.0f, 1.0f, 1.0f);//색 지정
-	gluSphere(earth, 3.3f, 24, 24); // 구를 그림
+	glColor3f(1.0f, 1.0f, 1.0f); // 색 지정
+	gluSphere(earth, radius_Earth, 24, 24); // 구를 그림
 
 	gluQuadricDrawStyle(earth, GLU_LINE); // 선을 긋는 형태로 설정
-	glColor3f(0.2f, 0.2f, 1.0f);//색 지정
-	gluSphere(earth, 3.35f, 24, 24); // 구를 그림
+	glColor3f(0.2f, 0.2f, 1.0f); // 색 지정
+	gluSphere(earth, radius_Earth + (GLfloat)0.05f, 24, 24); // 구를 그림
+	////
 
 	// Blue coordinate (z축 좌표)
 	glColor3f(0, 0, 1);
@@ -176,7 +177,7 @@ int OPenGLRenderer::DrawGLScene()
 	glPopMatrix(); // 지구 중심좌표 제거
 
 	glPushMatrix(); // 달 그리기 위한 좌표 추가
-	glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
+	glTranslatef(0.0f, 0.0f, -30.0f); // 먼저 원점을 지구와 맞춰줌
 	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //회전 변환 (z축) (달 공전) , 그리고 회전을 적용
 	glTranslatef(7.0f, 0.0f, 0.0f); // 지구와의 거리만큼 x축에서 이동
@@ -188,40 +189,55 @@ int OPenGLRenderer::DrawGLScene()
 	gluQuadricDrawStyle(moon, GLU_LINE); // 선을 긋는 형태로 설정
 	glColor3f(0.7f, 0.7f, 0.7f);
 	gluSphere(moon, 0.32f, 12, 12);
-	glPopMatrix();
+	glPopMatrix(); // 달 좌표 제거
 
 
-	for (int i = 0; i <= numOfCraft; i++) {
-		if (spaceCraft[i].craft != NULL) {
-			glPushMatrix(); // 우주물체를 그리기위한 좌표 추가
-			glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
+	for (int n = 0; n <= numOfCraft; n++) {
+		if (spaceCraft[n].craft != NULL) {
+			/*glPushMatrix(); // 우주물체를 그리기위한 좌표 추가
+			glTranslatef(0.0f, 0.0f, -30.0f); // 먼저 원점을 지구와 맞춰줌
 			glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
 
-			glTranslatef(spaceCraft[i].xpos, spaceCraft[i].ypos, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
+			glTranslatef(spaceCraft[n].xpos, spaceCraft[n].ypos, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
 
-			gluQuadricDrawStyle(spaceCraft[i].craft, GLU_FILL); // 객체를 채우는 형태로 설정
+			gluQuadricDrawStyle(spaceCraft[n].craft, GLU_FILL); // 객체를 채우는 형태로 설정
 			glColor3f(0.35f, 0.35f, 0.35f);
-			gluSphere(spaceCraft[i].craft, 0.3f, 12, 12);
+			gluSphere(spaceCraft[n].craft, 0.3f, 12, 12);
 
-			gluQuadricDrawStyle(spaceCraft[i].craft, GLU_LINE); // 선을 긋는 형태로 설정
+			gluQuadricDrawStyle(spaceCraft[n].craft, GLU_LINE); // 선을 긋는 형태로 설정
 			glColor3f(0.7f, 0.7f, 0.7f);
-			gluSphere(spaceCraft[i].craft, 0.32f, 12, 12);
+			gluSphere(spaceCraft[n].craft, 0.32f, 12, 12);
 			glPopMatrix();
 
-			spaceCraft[i].angle += spaceCraft[i].angleSpeed * time; // 각도 증가
-			if (spaceCraft[i].angle > 359.9f) spaceCraft[i].angle = 0.0f; // 360도 넘으면 0도로 
+			spaceCraft[n].angle += spaceCraft[n].angleSpeed * time; // 각도 증가
+			if (spaceCraft[n].angle > 359.9f) spaceCraft[n].angle = 0.0f; // 360도 넘으면 0도로 
 
-			spaceCraft[i].xpos = spaceCraft[i].radius * (GLfloat)cos(spaceCraft[i].angle);
-			spaceCraft[i].ypos = spaceCraft[i].radius * (GLfloat)sin(spaceCraft[i].angle);
+			spaceCraft[n].xpos = spaceCraft[n].radius * (GLfloat)cos(spaceCraft[n].angle);
+			spaceCraft[n].ypos = spaceCraft[n].radius * (GLfloat)sin(spaceCraft[n].angle);
+			*/
+			glPushMatrix(); // 추가된 우주물체 궤도를 그리기 위한 좌표 추가
+			glColor3f(1.0f, 1.0f, 1.0f);
+			glTranslatef(0.0f, 0.0f, -30.0f); // 먼저 원점을 지구와 맞춰줌
+			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
+			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // 이후 z축을 기준으로 omega만큼 회전 (승교점적경 적용)
+			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // 회전된 좌표축에서 x축을 기준으로 i만큼 회전 (궤도경사각 적용)
+			DrawTrajectory(n); // n번째 우주물체의 궤적을 그림
+			glPopMatrix();// 추가된 우주물체 궤도를 그리기 위한 좌표 삭제
+			/*
+			glPushMatrix(); // 우주물체를 그리기위한 좌표 추가
+			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
+			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // 이후 z축을 기준으로 omega만큼 회전 (승교점적경 적용)
+			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // 회전된 좌표축에서 x축을 기준으로 i만큼 회전 (궤도경사각 적용)
+			glPopMatrix();// 추가된 우주물체 궤도를 그리기 위한 좌표 삭제*/
 		}
 	}
 
 	glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
 	glColor3f(1.0f, 1.0f, 1.0f);
-	glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
+	glTranslatef(0.0f, 0.0f, -30.0f); // 먼저 원점을 지구와 맞춰줌
 	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
 	glBegin(GL_LINES);
 	for (GLfloat angle = 0; angle < 360; angle += 1.0f)
 	{
@@ -230,12 +246,13 @@ int OPenGLRenderer::DrawGLScene()
 		glVertex3f(moon_xpos, moon_ypos, moon_zpos);
 	}
 	glEnd();
-	glPopMatrix();
-	///////
-	glPushMatrix();
+	glPopMatrix(); // 달 궤도 좌표 제거
+
+	/*///////
+	glPushMatrix(); // 테스트 물체 좌표 추가
 	glColor3f(1.0f, 1.0f, 1.0f);
-	glTranslatef(0.0f, 0.0f, -10.0f); // 먼저 원점을 지구와 맞춰줌
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
+	glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
 	glTranslatef(spaceCraft[4].xpos, 0.0f, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
 	gluQuadricDrawStyle(spaceCraft[4].craft, GLU_FILL); // 객체를 채우는 형태로 설정
 	glColor3f(0.35f, 0.35f, 0.35f);
@@ -244,11 +261,11 @@ int OPenGLRenderer::DrawGLScene()
 	gluQuadricDrawStyle(spaceCraft[4].craft, GLU_LINE); // 선을 긋는 형태로 설정
 	glColor3f(0.7f, 0.7f, 0.7f);
 	gluSphere(spaceCraft[4].craft, 0.32f, 12, 12);
-	glPopMatrix();
+	glPopMatrix(); // 테스트 물체 좌표 제거
 
 	spaceCraft[4].xpos += spaceCraft[4].xvel * 0.0175f; // 이러면 딱 km/s 가 나온다
 	if (spaceCraft[4].xpos < 0.0f) spaceCraft[4].xpos = 5.0f;
-	///////
+	///////*/
 
 	glFlush();
 
@@ -328,4 +345,25 @@ int OPenGLRenderer::LoadGLTextures()
 // 우주물체를 직접적으로 생성하는 함수
 void OPenGLRenderer::CreateCraft(int num) {
 	spaceCraft[num].craft = gluNewQuadric(); // 물체 객체 인스턴스 생성
+}
+
+// 우주물체 궤적을 그려주는 함수
+void OPenGLRenderer::DrawTrajectory(int num) {
+	//GLfloat init_w = spaceCraft[num].w;
+	glRotatef(spaceCraft[num].w, 0.0f, 0.0f, 1.0f);
+
+	glBegin(GL_POINTS);
+	for (GLfloat angle_a = 0; angle_a < 360; angle_a += 0.1f)
+	{
+		spaceCraft[num].traj_range = (GLfloat)(spaceCraft[num].p / (1 + spaceCraft[num].e * cos(angle_a)));
+		spaceCraft[num].traj_xpos = (GLfloat)cos(angle_a) * spaceCraft[num].traj_range / 1000.0f;
+		spaceCraft[num].traj_ypos = (GLfloat)sin(angle_a) * spaceCraft[num].traj_range / 1000.0f;
+		glVertex3f(spaceCraft[num].traj_xpos, spaceCraft[num].traj_ypos, 0.0f);
+	}
+	glEnd();
+}
+
+// 우주물체 구를 그려주는 함수
+void OPenGLRenderer::DrawSphere(int num) {
+
 }
