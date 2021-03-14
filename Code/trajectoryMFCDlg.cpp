@@ -184,16 +184,35 @@ void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	CString str;
 	if (m_test->numOfCraft >= 1) {
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].p); // float -> CString
+		SetDlgItemText(IDC_EDIT0, str);
+
 		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft)-1].omega); // float -> CString
 		SetDlgItemText(IDC_EDIT1, str);
+
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].i); // float -> CString
+		SetDlgItemText(IDC_EDIT2, str);
+
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].a); // float -> CString
+		SetDlgItemText(IDC_EDIT3, str);
+
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].e); // float -> CString
+		SetDlgItemText(IDC_EDIT4, str);
+
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].w); // float -> CString
+		SetDlgItemText(IDC_EDIT5, str);
+
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].f); // float -> CString
+		SetDlgItemText(IDC_EDIT6, str);
 	}
-	
 	
 	CDialogEx::OnTimer(nIDEvent);
 }
 
 void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
 {
+	GM = m_test->G * m_test->mass_Earth; // 기준을 지구? 태양? 으로 할지 설정
+
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	if (m_test->numOfCraft <= 4) { // 물체는 5개까지 추가가능
 		GetDlgItemText(IDC_EDIT_XPOS, xpos); // XPOS 텍스트박스에 적힌 값을 xpos에 저장
@@ -210,19 +229,106 @@ void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
 		m_test->spaceCraft[m_test->numOfCraft].yvel = (GLfloat)atof((CStringA)yvel);
 		m_test->spaceCraft[m_test->numOfCraft].zvel = (GLfloat)atof((CStringA)zvel);
 
-		//// C1, C2, C3, h 구하기
-		m_test->spaceCraft[m_test->numOfCraft].C1 = (m_test->spaceCraft[m_test->numOfCraft].ypos * m_test->spaceCraft[m_test->numOfCraft].zvel) - (m_test->spaceCraft[m_test->numOfCraft].zpos * m_test->spaceCraft[m_test->numOfCraft].yvel);
-		m_test->spaceCraft[m_test->numOfCraft].C2 = (m_test->spaceCraft[m_test->numOfCraft].zpos * m_test->spaceCraft[m_test->numOfCraft].xvel) - (m_test->spaceCraft[m_test->numOfCraft].xpos * m_test->spaceCraft[m_test->numOfCraft].zvel);
-		m_test->spaceCraft[m_test->numOfCraft].C3 = (m_test->spaceCraft[m_test->numOfCraft].xpos * m_test->spaceCraft[m_test->numOfCraft].yvel) - (m_test->spaceCraft[m_test->numOfCraft].ypos * m_test->spaceCraft[m_test->numOfCraft].xvel);
-		m_test->spaceCraft[m_test->numOfCraft].h = (GLfloat)sqrt(pow(m_test->spaceCraft[m_test->numOfCraft].C1, 2) + pow(m_test->spaceCraft[m_test->numOfCraft].C2, 2) + pow(m_test->spaceCraft[m_test->numOfCraft].C3, 2));
+		CalculateCAndH(m_test->numOfCraft); // C1, C2, C3, h 구하기
 
-		//// 경사각 i와 승교점 적경 omege 구하기
-		radianI = (GLfloat)acos(m_test->spaceCraft[m_test->numOfCraft].C3 / m_test->spaceCraft[m_test->numOfCraft].h);
-		m_test->spaceCraft[m_test->numOfCraft].i = (radianI * 180.0f) / m_test->GL_PI;
-		radianOmega = (GLfloat)asin(m_test->spaceCraft[m_test->numOfCraft].C1 / m_test->spaceCraft[m_test->numOfCraft].h / sin(radianI));
-		m_test->spaceCraft[m_test->numOfCraft].omega= (radianOmega * 180.0f) / m_test->GL_PI;
+		CalculateOmegaAndI(m_test->numOfCraft); // 경사각 i와 승교점 적경 omege 구하기  ////// ***** omega에 심각한 문제가 있나? 어느정도 해결
 
+		CalculateAAndE(m_test->numOfCraft); // 장반경 a와 이심률 e 구하기
+		
+		CalculateWAndF(m_test->numOfCraft); // 근지점인수 w와 진근지점이각 f 구하기
+		
 		m_test->CreateCraft(m_test->numOfCraft); // 우주물체 생성
 		m_test->numOfCraft++; // 개체수 증가
 	}
+}
+
+void CtrajectoryMFCDlg::CalculateCAndH(int n) {
+	m_test->spaceCraft[n].C1 = (m_test->spaceCraft[n].ypos * m_test->spaceCraft[n].zvel) - (m_test->spaceCraft[n].zpos * m_test->spaceCraft[n].yvel);
+	m_test->spaceCraft[n].C2 = (m_test->spaceCraft[n].zpos * m_test->spaceCraft[n].xvel) - (m_test->spaceCraft[n].xpos * m_test->spaceCraft[n].zvel);
+	m_test->spaceCraft[n].C3 = (m_test->spaceCraft[n].xpos * m_test->spaceCraft[n].yvel) - (m_test->spaceCraft[n].ypos * m_test->spaceCraft[n].xvel);
+	m_test->spaceCraft[n].h = (GLfloat)sqrt(pow(m_test->spaceCraft[n].C1, 2) + pow(m_test->spaceCraft[n].C2, 2) + pow(m_test->spaceCraft[n].C3, 2));
+}
+
+void CtrajectoryMFCDlg::CalculateOmegaAndI(int n) {
+	radianI = (GLfloat)acos(m_test->spaceCraft[n].C3 / m_test->spaceCraft[n].h);
+	m_test->spaceCraft[n].i = (radianI * 180.0f) / m_test->GL_PI;
+
+	if (m_test->spaceCraft[n].C1 != 0) { // C1이 0이 아닌 경우
+		temp = (double)m_test->spaceCraft[n].C1 / ((double)m_test->spaceCraft[n].h * sin(radianI));
+		if (temp >= 1.0) temp = 1.0; // 여기 보정필요
+		radianOmega = asinf(temp);
+	}
+	else if(m_test->spaceCraft[n].C1 == 0 && m_test->spaceCraft[n].C2 != 0){ //  C2가 0이 아닌 경우
+		temp = (double)m_test->spaceCraft[n].C2 / (-(double)m_test->spaceCraft[n].h * sin(radianI));
+		if (temp >= 1.0) temp = 1.0; // 여기 보정필요
+		radianOmega = acosf(temp);
+	}
+	else if (m_test->spaceCraft[n].C1 == 0 && m_test->spaceCraft[n].C2 == 0) { // C1, C2 둘다 0인 경우
+		radianOmega = 0.0;
+	}
+	m_test->spaceCraft[n].omega = (GLfloat)((radianOmega)*180.0f/ m_test->GL_PI);
+}
+
+void CtrajectoryMFCDlg::CalculateAAndE(int n) { // a e p 구함
+	// 초기거리와 초기속도를 구함
+	m_test->spaceCraft[n].range = (GLfloat)sqrt(pow(m_test->spaceCraft[n].xpos, 2) + pow(m_test->spaceCraft[n].ypos, 2) + pow(m_test->spaceCraft[n].zpos, 2));
+	m_test->spaceCraft[n].velocity = (GLfloat)sqrt(pow(m_test->spaceCraft[n].xvel, 2) + pow(m_test->spaceCraft[n].yvel, 2) + pow(m_test->spaceCraft[n].zvel, 2));
+	// 속도벡터의 크기를 이용해서 장반경을 구하기 전에 타원궤도인지 쌍곡선궤도인지 알아야함
+	int type = 0;
+	type = CheckTrajShape(n);
+	if (type == 1) { // 타원궤도
+		reciprocal_a = (2.0 / (1000.0 * (double)(m_test->spaceCraft[n].range))) - ((double)pow(1000.0 * m_test->spaceCraft[n].velocity, 2) / GM);// 태양으로 임시설정(지구예제는 나중에) (km->m)
+	}
+	else { // 쌍곡선궤도
+		reciprocal_a = ((double)pow(1000.0 * m_test->spaceCraft[n].velocity, 2) / GM) - (2.0 / (1000.0 * (double)(m_test->spaceCraft[n].range)));// 태양으로 임시설정(지구예제는 나중에) (km->m)
+	}
+
+	m_test->spaceCraft[n].a = (GLfloat)(1.0 / reciprocal_a) / 1000.0f; // (m->km)
+	squarh = pow((double)m_test->spaceCraft[n].h, 2); // h^2
+	square = 1 - (squarh / (GM * pow(10, -9) * m_test->spaceCraft[n].a)); // GM을 pow(10,-9)를 통해 km로 맞춰줌
+	m_test->spaceCraft[n].e = (GLfloat)sqrt(square);
+
+	if (type == 1) { // 타원궤도
+		m_test->spaceCraft[n].p = m_test->spaceCraft[n].a * (1 - (GLfloat)pow(m_test->spaceCraft[n].e, 2));
+	}
+	else { // 쌍곡선궤도
+		m_test->spaceCraft[n].p = m_test->spaceCraft[n].a * ((GLfloat)pow(m_test->spaceCraft[n].e, 2) - 1);
+	}
+}
+
+int CtrajectoryMFCDlg::CheckTrajShape(int n) {
+	GLfloat escapevelocity = 0.0f;
+	int ellipse = 1;
+	int hyperbola = 2;
+
+	escapevelocity = (GLfloat)sqrt((2.0 * GM) / (1000.0 * m_test->spaceCraft[n].range));
+	escapevelocity /= 1000.0f;
+
+	if (escapevelocity <= m_test->spaceCraft[n].velocity)
+		return hyperbola;
+	else
+		return ellipse;
+}
+
+void CtrajectoryMFCDlg::CalculateWAndF(int n) {
+	// f 구하기 (f의 사분면을 아직 고려해야함)
+	posXvel = m_test->spaceCraft[n].xpos * m_test->spaceCraft[n].xvel + m_test->spaceCraft[n].ypos * m_test->spaceCraft[n].yvel + m_test->spaceCraft[n].zpos * m_test->spaceCraft[n].zvel;
+	tanf = (m_test->spaceCraft[n].p / m_test->spaceCraft[n].h) * (posXvel / (m_test->spaceCraft[n].p - m_test->spaceCraft[n].range));
+	radianF = atanf(tanf);
+	m_test->spaceCraft[n].f = (GLfloat)(radianF * 180.0 / (double)m_test->GL_PI);
+
+	if (m_test->spaceCraft[n].f < 0.0f) { // f가 음수이면 양수화
+		m_test->spaceCraft[n].f = 360.0f - m_test->spaceCraft[n].f;
+	}
+
+	// u 구하기
+	cosu = (m_test->spaceCraft[n].xpos * cos(radianOmega) + m_test->spaceCraft[n].ypos * sin(radianOmega)) / m_test->spaceCraft[n].range;
+	radianU = acosf(cosu);
+	m_test->spaceCraft[n].u = (GLfloat)(radianU * 180.0 / (double)m_test->GL_PI);
+
+	if (m_test->spaceCraft[n].u < m_test->spaceCraft[n].f) {
+		m_test->spaceCraft[n].u += 360.0f;
+	}
+	// w 구하기
+	m_test->spaceCraft[n].w = m_test->spaceCraft[n].u - m_test->spaceCraft[n].f;
 }
