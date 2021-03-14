@@ -40,8 +40,34 @@ public:
 
 	// 궤도요소 라디안 크기의 임시변수
 	GLfloat radianI = 0.0f;
-	GLfloat radianOmega = 0.0f;
-	
+	double radianOmega = 0.0;
+	double radianU = 0.0;
+	double radianF = 0.0;
+
+	double temp = 0.0; // 오메가 구하기 용
+	double cosu = 0.0; // u 구하기 용
+	double tanf = 0.0f; // f 구하기 용
+	// 역수의 임시변수
+	double reciprocal_a = 0.0f; // (작은값이라 double 사용)
+
+	// 우주상수 mu = GM
+	double GM = 0.0;
+
+	// h^2 , e^2
+	double squarh = 0.0;
+	double square = 0.0;
+
+	// 위치벡터와 속도벡터 성분의 곱 posXvel
+	GLfloat posXvel = 0.0f;
+
+	///궤도요소를 구하는 함수
+	void CalculateCAndH(int n); // C1, C2, C3, h 구하기
+	void CalculateOmegaAndI(int n); // omega 와 i를 구하기
+	void CalculateAAndE(int n); // 장반경 a와 이심률 e 구하기
+	int CheckTrajShape(int n); // 타원궤도인지 쌍곡선궤도인지 검사
+	void CalculateWAndF(int n); // 근지점인수 w와 진근지점이각 f 구하기
+
+
 	afx_msg void OnTimer(UINT_PTR nIDEvent); // WM_TIMER로 추가한 함수
 	afx_msg void OnBnClickedButtonAdd(); // ADD 버튼이 클릭되면
 };
