@@ -12,7 +12,10 @@ typedef struct {
 	GLfloat xpos = 0.0f, ypos = 0.0f, zpos = 0.0f;
 	GLfloat xvel = 0.0f, yvel = 0.0f, zvel = 0.0f;
 	GLfloat C1 = 0.0f, C2 = 0.0f, C3 = 0.0f, h = 0.0f;
-	GLfloat i = 0.0f, omega = 0.0f;
+	GLfloat i = 0.0f, omega = 0.0f, a = 0.0f, e = 0.0f, w = 0.0f, T = 0.0f; // 궤도의 6요소
+	GLfloat u = 0.0f, f = 0.0f, p = 0.0f; // u = w + f , f는 진근지점이각 True anomaly , p는 반직현
+	GLfloat range = 0.0f, velocity = 0.0f; // 초기 거리, 초기 속도
+	GLfloat traj_range = 0.0f, traj_xpos = 0.0f, traj_ypos = 0.0f;  // 궤도를 그리기 위한 변하는 변수들
 	GLfloat angleSpeed = 36.0f; // angle per t
 	GLfloat angle = 0.0f;
 	GLfloat radius = 7.0f;
@@ -30,17 +33,23 @@ public:
 	void DestroyScene();
 	int DrawGLScene();				//Here's where we do all the drawing
 	bool initAi();
+
+	// 그리기용 사용자 설정 함수
 	void CreateCraft(int num); // 우주물체 객체를 생성하는 함수
+	void DrawTrajectory(int num); // 우주물체 궤적을 그려주는 함수
+	void DrawSphere(int num); // 우주물체 구를 그려주는 함수
 	
 	// 텍스처 관련 함수
 	AUX_RGBImageRec* LoadBMPFile(char* filename); // 변수에 이미지를 불러오는 함수
 	int LoadGLTextures(); //텍스쳐 작업을 해주는 함수
+
+	
 public:
-	// 지구 회전 성분
-	GLfloat		xrot = 0;
-	GLfloat		yrot = 0;
-	GLfloat		zrot = 0;
-	GLfloat		GL_PI = (GLfloat)3.141592;
+	// 지구의 성분
+	GLfloat		zrot = 0; // 지구 자전 속도
+	GLfloat     radius_Earth = 6.378f; ////////// 1.0f = 1000km //////////
+	GLfloat     mass_Earth = (GLfloat)5.972 * (GLfloat)pow(10, 24); // kg
+	double      G = 6.673 * pow(10, -11); // m^3/kg/s^2 (중력상수)
 
 	// 달 회전 성분
 	GLfloat		moon_xrot = 0;
@@ -52,9 +61,12 @@ public:
 
 	GLUquadricObj* earth = NULL; // 지구 객체
 	GLUquadricObj* moon = NULL; // 달 객체
-
 	vecInfo_t spaceCraft[5]; // 우주물체 객체
 	int numOfCraft = 0; // 우주물체 갯수
+
+	/// 수식에 필요한 변수선언
+	GLfloat		GL_PI = (GLfloat)3.141592;
+	GLfloat     mass_Sun = 2.0f * (GLfloat)pow(10, 30); // kg
 
 	/// 시간관련 변수
 	GLfloat time = 0.000278f; // 단위시간 지정 (초당 속도를 나타내기 위해) -> 0.000278을 기준으로 초당 각속도를 나타낼 수 있음
