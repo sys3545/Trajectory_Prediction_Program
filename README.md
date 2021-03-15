@@ -18,4 +18,4 @@ Released version 0.0.5 (2021 03 10) :
 we can calculate omega and inclination , Time unit problem was solved (but it's not perfect yet)   
    
 Released version 0.0.5 (2021 03 14) :   
-Trajectory drawing is done , but w, f is not perfect yet.   
+Trajectory drawing is done , but w, f are not perfect yet.   
