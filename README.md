@@ -1,5 +1,9 @@
 # Trajectory_Prediction
 The repository for Trajectory Prediction program in Two-Body Problem 
+   
+# Example Screen   
+<img width="893" alt="screen" src="https://user-images.githubusercontent.com/61923882/111413732-2982ae00-8722-11eb-9c42-0fe7df4a94a5.PNG">
+
 
 # Version
 Released version 0.0.1 (2021 03 05) :   
@@ -19,7 +23,3 @@ we can calculate omega and inclination , Time unit problem was solved (but it's 
    
 Released version 0.0.5 (2021 03 14) :   
 Trajectory drawing is done , but w, f are not perfect yet.   
-
-   
-# Example Screen   
-<img width="893" alt="screen" src="https://user-images.githubusercontent.com/61923882/111413732-2982ae00-8722-11eb-9c42-0fe7df4a94a5.PNG">
