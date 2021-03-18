@@ -38,12 +38,12 @@ public:
 	void CreateCraft(int num); // 우주물체 객체를 생성하는 함수
 	void DrawTrajectory(int num); // 우주물체 궤적을 그려주는 함수
 	void DrawSphere(int num); // 우주물체 구를 그려주는 함수
-	
+
 	// 텍스처 관련 함수
 	AUX_RGBImageRec* LoadBMPFile(char* filename); // 변수에 이미지를 불러오는 함수
 	int LoadGLTextures(); //텍스쳐 작업을 해주는 함수
 
-	
+
 public:
 	// 지구의 성분
 	GLfloat		zrot = 0; // 지구 자전 속도
@@ -83,6 +83,11 @@ public:
 	AUX_RGBImageRec* pTextureImage[1]; // 이미지 파일에 대한 정보를 가지고 있는 배열
 	GLuint textureID[1]; // 텍스처의 핸들을 저장하는 배열
 
+	// 마우스 입력시 회전 변수
+	BOOL b_Rotate; // 마우스 상태에 따른 회전을 감지
+	GLfloat mousePoint; // 마우스 위치를 잡는 변수
+	GLfloat zAngle = 0.0f; // 화면 회전 각도
+
 protected:
 	bool InitContext(CWnd* parent);					 // Creates OpenGL Rendering Context
 
@@ -93,5 +98,7 @@ protected:
 public:
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
 
