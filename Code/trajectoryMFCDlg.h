@@ -59,6 +59,7 @@ public:
 
 	// 위치벡터와 속도벡터 성분의 곱 posXvel
 	GLfloat posXvel = 0.0f;
+	GLfloat CircleVelocity = 0.0f;
 
 	///궤도요소를 구하는 함수
 	void CalculateCAndH(int n); // C1, C2, C3, h 구하기
@@ -66,7 +67,9 @@ public:
 	void CalculateAAndE(int n); // 장반경 a와 이심률 e 구하기
 	int CheckTrajShape(int n); // 타원궤도인지 쌍곡선궤도인지 검사
 	void CalculateWAndF(int n); // 근지점인수 w와 진근지점이각 f 구하기
-
+	int CheckSignOfF(int n); // radius 벡터 미분의 부호를 판단하여 f의 사분면을 결정
+	void CanMakeCircle(int n); // 원궤도를 만들 수 있는지 판단. 못만드는 궤도에선 w를 뒤집어 줘야함
+	void AdjustTrajectory(int n); // 방향에 따른 궤도에서 보정을 해줘야함
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent); // WM_TIMER로 추가한 함수
 	afx_msg void OnBnClickedButtonAdd(); // ADD 버튼이 클릭되면
