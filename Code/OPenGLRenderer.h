@@ -8,7 +8,7 @@
 #pragma comment(lib,"GLAUX.LIB")
 #pragma comment(lib,"legacy_stdio_definitions.lib")
 
-typedef struct {
+typedef struct vecInfo_t {
 	GLfloat xpos = 0.0f, ypos = 0.0f, zpos = 0.0f;
 	GLfloat xvel = 0.0f, yvel = 0.0f, zvel = 0.0f;
 	GLfloat C1 = 0.0f, C2 = 0.0f, C3 = 0.0f, h = 0.0f;
@@ -16,9 +16,9 @@ typedef struct {
 	GLfloat u = 0.0f, f = 0.0f, p = 0.0f; // u = w + f , f는 진근지점이각 True anomaly , p는 반직현
 	GLfloat range = 0.0f, velocity = 0.0f; // 초기 거리, 초기 속도
 	GLfloat traj_range = 0.0f, traj_xpos = 0.0f, traj_ypos = 0.0f;  // 궤도를 그리기 위한 변하는 변수들
-	GLfloat angleSpeed = 36.0f; // angle per t
-	GLfloat angle = 0.0f;
-	GLfloat radius = 7.0f;
+	GLfloat angleSpeed = 0.0f; // angle per t
+	GLfloat angle = 0.0f; // 변하는 각  (초기각은 f)
+	GLfloat radius = 0.0f; // 변하는 거리 (초기 거리에서 시작)
 	GLUquadricObj* craft = NULL;
 }vecInfo_t;
 
