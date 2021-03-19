@@ -18,7 +18,7 @@ public:
 	enum { IDD = IDD_TRAJECTORYMFC_DIALOG };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
 
