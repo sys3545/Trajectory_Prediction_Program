@@ -86,7 +86,9 @@ public:
 	// 마우스 입력시 회전 변수
 	BOOL b_Rotate; // 마우스 상태에 따른 회전을 감지
 	GLfloat mousePoint; // 마우스 위치를 잡는 변수
+	GLfloat differ; // 마우스가 움직인 정도
 	GLfloat zAngle = 0.0f; // 화면 회전 각도
+	GLfloat zoom = 0.0f;
 
 protected:
 	bool InitContext(CWnd* parent);					 // Creates OpenGL Rendering Context
@@ -100,5 +102,6 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 };
-
