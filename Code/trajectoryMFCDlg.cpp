@@ -21,12 +21,12 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 대화 상자 데이터입니다.
+	// 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 
 // 구현입니다.
@@ -150,7 +150,7 @@ void CtrajectoryMFCDlg::OnPaint()
 	if (IsIconic())
 	{
 		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
-		
+
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
 		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
@@ -183,12 +183,13 @@ void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	CString str;
+	
 	if (m_test->numOfCraft >= 1) {
-		//str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].h); // float -> CString
-		str.Format(_T("%f"), m_test->mousePoint); // float -> CString
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].h); // float -> CString
+		//str.Format(_T("%f"), m_test->differ); // float -> CString
 		SetDlgItemText(IDC_EDIT0, str);
 
-		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft)-1].omega); // float -> CString
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].omega); // float -> CString
 		SetDlgItemText(IDC_EDIT1, str);
 
 		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].i); // float -> CString
@@ -206,7 +207,7 @@ void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].f); // float -> CString
 		SetDlgItemText(IDC_EDIT6, str);
 	}
-	
+
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -235,13 +236,13 @@ void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
 		CalculateOmegaAndI(m_test->numOfCraft); // 경사각 i와 승교점 적경 omege 구하기
 
 		CalculateAAndE(m_test->numOfCraft); // 장반경 a와 이심률 e 구하기
-		
+
 		CalculateWAndF(m_test->numOfCraft); // 근지점인수 w와 진근지점이각 f 구하기
 
 		CanMakeCircle(m_test->numOfCraft); // 원궤도를 만들 수 있는지 판단. 못만드는 궤도에선 w를 뒤집어 줘야함
-		  
-		//AdjustTrajectory(m_test->numOfCraft); // 방향에 따른 궤도를 보정을 해줘야함
-		
+
+		AdjustTrajectory(m_test->numOfCraft); // 방향에 따른 궤도를 보정을 해줘야함
+
 		m_test->CreateCraft(m_test->numOfCraft); // 우주물체 생성
 		m_test->numOfCraft++; // 개체수 증가
 	}
@@ -263,7 +264,7 @@ void CtrajectoryMFCDlg::CalculateOmegaAndI(int n) {
 		if (temp >= 1.0) temp = 1.0; // 여기 보정필요
 		radianOmega = asinf(temp);
 	}
-	else if(m_test->spaceCraft[n].C1 == 0 && m_test->spaceCraft[n].C2 != 0){ //  C2가 0이 아닌 경우
+	else if (m_test->spaceCraft[n].C1 == 0 && m_test->spaceCraft[n].C2 != 0) { //  C2가 0이 아닌 경우
 		temp = (double)m_test->spaceCraft[n].C2 / (-(double)m_test->spaceCraft[n].h * sin(radianI));
 		if (temp >= 1.0) temp = 1.0; // 여기 보정필요
 		radianOmega = acosf(temp);
@@ -347,15 +348,15 @@ void CtrajectoryMFCDlg::CalculateWAndF(int n) { /// w에 문제가 있다.
 }
 
 int CtrajectoryMFCDlg::CheckSignOfF(int n) {
-	
+
 	int positive = 1;
 	int negative = 2;
 
-	if(m_test->spaceCraft[n].xpos != m_test->spaceCraft[n].ypos)
+	if (m_test->spaceCraft[n].xpos != m_test->spaceCraft[n].ypos)
 		posXvel = m_test->spaceCraft[n].xpos * m_test->spaceCraft[n].xvel + m_test->spaceCraft[n].ypos * m_test->spaceCraft[n].yvel + m_test->spaceCraft[n].zpos * m_test->spaceCraft[n].zvel;
 	else
 		posXvel = (m_test->spaceCraft[n].xpos + 0.000001f) * m_test->spaceCraft[n].xvel + m_test->spaceCraft[n].ypos * m_test->spaceCraft[n].yvel + m_test->spaceCraft[n].zpos * m_test->spaceCraft[n].zvel;
-	
+
 	if (posXvel < 0.0) {
 		return negative;
 	}
@@ -376,15 +377,13 @@ void CtrajectoryMFCDlg::CanMakeCircle(int n) { // 제1 우주 속도를 만족�
 }
 
 void CtrajectoryMFCDlg::AdjustTrajectory(int n) {
-	GLfloat multiple_vel;
-
-	multiple_vel = m_test->spaceCraft[n].xvel * m_test->spaceCraft[n].yvel * m_test->spaceCraft[n].zvel;
-
-	if (multiple_vel < 0.0f && m_test->spaceCraft[n].xpos < 0.0f) {
-		m_test->spaceCraft[n].i += 90.0f;    /// 여기는 고쳐야 할 수도 있음
-		m_test->spaceCraft[n].omega = -m_test->spaceCraft[n].omega;
-		m_test->spaceCraft[n].w -= 270.0f;
-		//m_test->spaceCraft[n].f += 180.0f;
-		//CanMakeCircle(n);
+	
+	if (m_test->spaceCraft[n].xvel != 0.0f && m_test->spaceCraft[n].yvel != 0.0f) 
+	{
+		if (m_test->spaceCraft[n].zvel * m_test->spaceCraft[n].xpos < 0) 
+		{
+			m_test->spaceCraft[n].omega += 90.0f;
+			m_test->spaceCraft[n].w += 90.0f;
+		}
 	}
 }
