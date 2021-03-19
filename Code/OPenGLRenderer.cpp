@@ -7,6 +7,8 @@ BEGIN_MESSAGE_MAP(OPenGLRenderer, CWnd)
 	ON_WM_KEYDOWN()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 
 
@@ -20,13 +22,6 @@ void OPenGLRenderer::OnTimer(UINT_PTR nIDEvent)
 		DrawGLScene();
 		SwapBuffers(m_hdc);
 		wglMakeCurrent(m_hdc, NULL);
-
-		currentTime = glutGet(GLUT_ELAPSED_TIME); // 시간 간격 얻기
-		deltaTime = currentTime - oldTime;
-		oldTime = currentTime;
-
-		if (deltaTime <= 30)
-			Sleep(30 - deltaTime);
 
 		break;
 	default:
@@ -123,7 +118,7 @@ void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 
 	glEnable(GL_DEPTH_TEST); // 깊이 버퍼를 사용할 것을 알림
 
-
+	zoom = -30.0f; // 초기 줌 정도 설정
 	earth = gluNewQuadric(); // 지구 객체 인스턴스 생성
 	moon = gluNewQuadric(); // 달 객체 인스턴스 생성
 	spaceCraft[4].craft = gluNewQuadric();
@@ -154,13 +149,13 @@ int OPenGLRenderer::DrawGLScene()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //배경 클리어
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 버퍼 비트 클리어 (고정)
 	glLoadIdentity(); // (고정)
+	glTranslatef(0.0f, 0.0f, zoom); //원점의 이동
+	glRotatef(zAngle, 0.0f, 1.0f, 0.0f); // z축을 기준으로 좌표축 회전(화면 회전용)
 
 	////draw Earth
 	glPushMatrix(); // 지구중심좌표 추가
-	glTranslatef(0.0f, 0.0f, -30.0f); //원점의 이동
 	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 자전축 맞추기용 )
-	//glRotatef(zAngle, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 회전(화면 회전용)
-
+	
 	glRotatef(zrot, 0.0f, 0.0f, 1.0f); //회전 변환 (z축) (지구 자전)
 	gluQuadricDrawStyle(earth, GLU_FILL); // 객체를 채우는 형태로 설정
 	glColor3f(1.0f, 1.0f, 1.0f); // 색 지정
@@ -174,13 +169,12 @@ int OPenGLRenderer::DrawGLScene()
 	// Blue coordinate (z축 좌표)
 	glColor3f(0, 0, 1);
 	glBegin(GL_LINE_LOOP);
-	glVertex3f(0.0, 0.0, 20.0);
-	glVertex3f(0.0, 0.0, -20.0);
+	glVertex3f(0.0, 0.0, 40.0);
+	glVertex3f(0.0, 0.0, -40.0);
 	glEnd();
 	glPopMatrix(); // 지구 중심좌표 제거
 
 	glPushMatrix(); // 달 그리기 위한 좌표 추가
-	glTranslatef(0.0f, 0.0f, -30.0f); // 먼저 원점을 지구와 맞춰줌
 	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //회전 변환 (z축) (달 공전) , 그리고 회전을 적용
 	glTranslatef(7.0f, 0.0f, 0.0f); // 지구와의 거리만큼 x축에서 이동
@@ -221,28 +215,27 @@ int OPenGLRenderer::DrawGLScene()
 			*/
 			glPushMatrix(); // 추가된 우주물체 궤도를 그리기 위한 좌표 추가
 			glColor3f(1.0f, 1.0f, 1.0f);
-			glTranslatef(0.0f, 0.0f, -30.0f); // 먼저 원점을 지구와 맞춰줌
 			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
 			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // 이후 z축을 기준으로 omega만큼 회전 (승교점적경 적용)
 			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // 회전된 좌표축에서 x축을 기준으로 i만큼 회전 (궤도경사각 적용)
 			DrawTrajectory(n); // n번째 우주물체의 궤적을 그림
 			glPopMatrix();// 추가된 우주물체 궤도를 그리기 위한 좌표 삭제
-			/*
+			
 			glPushMatrix(); // 우주물체를 그리기위한 좌표 추가
 			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
 			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // 이후 z축을 기준으로 omega만큼 회전 (승교점적경 적용)
 			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // 회전된 좌표축에서 x축을 기준으로 i만큼 회전 (궤도경사각 적용)
-			glPopMatrix();// 추가된 우주물체 궤도를 그리기 위한 좌표 삭제*/
+			DrawSphere(n);
+			glPopMatrix();// 추가된 우주물체 궤도를 그리기 위한 좌표 삭제
 		}
 	}
 
 	glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
 	glColor3f(1.0f, 1.0f, 1.0f);
-	glTranslatef(0.0f, 0.0f, -30.0f); // 먼저 원점을 지구와 맞춰줌
 	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
-	glBegin(GL_LINES);
-	for (GLfloat angle = 0; angle < 360; angle += 1.0f)
+	glBegin(GL_POINTS);
+	for (GLfloat angle = 0; angle < 360; angle += 0.1f)
 	{
 		moon_xpos = (GLfloat)cos(angle) * 7.0f;
 		moon_ypos = (GLfloat)sin(angle) * 7.0f;
@@ -387,10 +380,12 @@ void OPenGLRenderer::DrawSphere(int num) {
 void OPenGLRenderer::OnLButtonDown(UINT nFlags, CPoint point) // 클릭하면 클릭 시의 마우스 위치가 저장된다.
 {
 	GLfloat x;
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	b_Rotate = TRUE; // 회전모드 시작
 	x = point.x;
 	mousePoint = x;
+
 	CWnd::OnLButtonDown(nFlags, point);
 }
 
@@ -398,6 +393,41 @@ void OPenGLRenderer::OnLButtonDown(UINT nFlags, CPoint point) // 클릭하면 �
 void OPenGLRenderer::OnMouseMove(UINT nFlags, CPoint point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	GLfloat x;
+	
+
+	x = point.x;
+	if (b_Rotate) {
+		differ = x - mousePoint;
+	}
+
+	zAngle += differ/100.0f;
+
+	if (zAngle > 359.0f || zAngle < -359.0f) zAngle = 0.0f;
 
 	CWnd::OnMouseMove(nFlags, point);
+}
+
+
+void OPenGLRenderer::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	b_Rotate = FALSE;
+	differ = 0.0f;
+	CWnd::OnLButtonUp(nFlags, point);
+}
+
+
+BOOL OPenGLRenderer::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) // 화면 줌아웃
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	GLfloat temp_zoom;
+	temp_zoom = ((GLfloat)zDelta) / 100.0f;
+
+	zoom += temp_zoom;
+
+	if (zoom < -80.0f) zoom = -80.0f;
+	if (zoom > -20.0f) zoom = -20.0f;
+
+	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
 }
