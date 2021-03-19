@@ -25,6 +25,6 @@ Released version 0.0.5 (2021 03 14) :
 Trajectory drawing is done , but w, f are not perfect yet.   
 
 Released version 0.1.0 (2021 03 18) :   
-Trajectory drawing is almost perfect. Need to check more case.
+Trajectory drawing is almost perfect. Need to check more case.   
 Mouse control is possible.   
     
