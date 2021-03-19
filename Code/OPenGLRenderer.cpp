@@ -191,28 +191,6 @@ int OPenGLRenderer::DrawGLScene()
 
 	for (int n = 0; n <= numOfCraft; n++) {
 		if (spaceCraft[n].craft != NULL) {
-			/*glPushMatrix(); // 우주물체를 그리기위한 좌표 추가
-			glTranslatef(0.0f, 0.0f, -30.0f); // 먼저 원점을 지구와 맞춰줌
-			glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
-			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
-
-			glTranslatef(spaceCraft[n].xpos, spaceCraft[n].ypos, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
-
-			gluQuadricDrawStyle(spaceCraft[n].craft, GLU_FILL); // 객체를 채우는 형태로 설정
-			glColor3f(0.35f, 0.35f, 0.35f);
-			gluSphere(spaceCraft[n].craft, 0.3f, 12, 12);
-
-			gluQuadricDrawStyle(spaceCraft[n].craft, GLU_LINE); // 선을 긋는 형태로 설정
-			glColor3f(0.7f, 0.7f, 0.7f);
-			gluSphere(spaceCraft[n].craft, 0.32f, 12, 12);
-			glPopMatrix();
-
-			spaceCraft[n].angle += spaceCraft[n].angleSpeed * time; // 각도 증가
-			if (spaceCraft[n].angle > 359.9f) spaceCraft[n].angle = 0.0f; // 360도 넘으면 0도로
-
-			spaceCraft[n].xpos = spaceCraft[n].radius * (GLfloat)cos(spaceCraft[n].angle);
-			spaceCraft[n].ypos = spaceCraft[n].radius * (GLfloat)sin(spaceCraft[n].angle);
-			*/
 			glPushMatrix(); // 추가된 우주물체 궤도를 그리기 위한 좌표 추가
 			glColor3f(1.0f, 1.0f, 1.0f);
 			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
@@ -363,9 +341,11 @@ void OPenGLRenderer::DrawTrajectory(int num) {
 void OPenGLRenderer::DrawSphere(int num) {
 	glRotatef(spaceCraft[num].w, 0.0f, 0.0f, 1.0f); // w 만큼 그리는 기준면 회전
 	// 여기서 f만큼 회전한 위치에서 초기 구체 생성
-	spaceCraft[num].xpos = (GLfloat)cos(spaceCraft[num].f * GL_PI / 180.0f) * spaceCraft[num].range / 1000.0f;
-	spaceCraft[num].ypos = (GLfloat)sin(spaceCraft[num].f * GL_PI / 180.0f) * spaceCraft[num].range / 1000.0f;
+	spaceCraft[num].xpos = (GLfloat)cos(spaceCraft[num].angle * GL_PI / 180.0f) * spaceCraft[num].radius / 1000.0f;
+	spaceCraft[num].ypos = (GLfloat)sin(spaceCraft[num].angle * GL_PI / 180.0f) * spaceCraft[num].radius / 1000.0f;
 
+
+	// drawing
 	glTranslatef(spaceCraft[num].xpos, spaceCraft[num].ypos, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
 	gluQuadricDrawStyle(spaceCraft[num].craft, GLU_FILL); // 객체를 채우는 형태로 설정
 	glColor3f(0.35f, 0.35f, 0.35f);
@@ -374,6 +354,12 @@ void OPenGLRenderer::DrawSphere(int num) {
 	gluQuadricDrawStyle(spaceCraft[num].craft, GLU_LINE); // 선을 긋는 형태로 설정
 	glColor3f(0.7f, 0.7f, 0.7f);
 	gluSphere(spaceCraft[num].craft, 0.32f, 12, 12);
+
+	// Update values
+	spaceCraft[num].angleSpeed = spaceCraft[num].h / (GLfloat)pow((double)spaceCraft[num].radius, 2); // 각속도 구하기
+	spaceCraft[num].angle += (spaceCraft[num].angleSpeed * 180.0f) / GL_PI; // 각속도 적용
+	
+	spaceCraft[num].radius = (GLfloat)(spaceCraft[num].p / (1 + spaceCraft[num].e * cos(spaceCraft[num].angle * GL_PI / 180.0f)));
 }
 
 
