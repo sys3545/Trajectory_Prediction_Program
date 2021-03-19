@@ -185,7 +185,7 @@ void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 	CString str;
 	
 	if (m_test->numOfCraft >= 1) {
-		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].h); // float -> CString
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].angleSpeed); // float -> CString
 		//str.Format(_T("%f"), m_test->differ); // float -> CString
 		SetDlgItemText(IDC_EDIT0, str);
 
@@ -280,6 +280,8 @@ void CtrajectoryMFCDlg::CalculateAAndE(int n) { // a e p 구함
 	// 초기거리와 초기속도를 구함
 	m_test->spaceCraft[n].range = (GLfloat)sqrt(pow(m_test->spaceCraft[n].xpos, 2) + pow(m_test->spaceCraft[n].ypos, 2) + pow(m_test->spaceCraft[n].zpos, 2));
 	m_test->spaceCraft[n].velocity = (GLfloat)sqrt(pow(m_test->spaceCraft[n].xvel, 2) + pow(m_test->spaceCraft[n].yvel, 2) + pow(m_test->spaceCraft[n].zvel, 2));
+	m_test->spaceCraft[n].radius = m_test->spaceCraft[n].range;
+
 	// 속도벡터의 크기를 이용해서 장반경을 구하기 전에 타원궤도인지 쌍곡선궤도인지 알아야함
 	int type = 0;
 	type = CheckTrajShape(n);
@@ -374,6 +376,8 @@ void CtrajectoryMFCDlg::CanMakeCircle(int n) { // 제1 우주 속도를 만족�
 		m_test->spaceCraft[n].w += 180.0f;
 		m_test->spaceCraft[n].f += 180.0f;
 	}
+
+	m_test->spaceCraft[n].angle = m_test->spaceCraft[n].f; // f를 초기각으로 설정
 }
 
 void CtrajectoryMFCDlg::AdjustTrajectory(int n) {
@@ -384,6 +388,10 @@ void CtrajectoryMFCDlg::AdjustTrajectory(int n) {
 		{
 			m_test->spaceCraft[n].omega += 90.0f;
 			m_test->spaceCraft[n].w += 90.0f;
+			if (m_test->spaceCraft[n].xpos * m_test->spaceCraft[n].ypos > 0)
+				m_test->spaceCraft[n].i += 90.0f;
+			if (m_test->spaceCraft[n].ypos > 0)
+				m_test->spaceCraft[n].w -= 180.0f;
 		}
 	}
 }
