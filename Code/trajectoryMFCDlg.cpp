@@ -69,6 +69,8 @@ BEGIN_MESSAGE_MAP(CtrajectoryMFCDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BUTTON_ADD, &CtrajectoryMFCDlg::OnBnClickedButtonAdd)
+	ON_BN_CLICKED(IDC_BUTTON_FASTER, &CtrajectoryMFCDlg::OnBnClickedButtonFaster)
+	ON_BN_CLICKED(IDC_BUTTON_SLOWER, &CtrajectoryMFCDlg::OnBnClickedButtonSlower)
 END_MESSAGE_MAP()
 
 
@@ -183,10 +185,13 @@ void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	CString str;
+
+	str.Format(_T("%d"), m_test->realTime); // int->CString
+	SetDlgItemText(IDC_EDIT_TIME, str);
 	
 	if (m_test->numOfCraft >= 1) {
-		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].angleSpeed); // float -> CString
-		//str.Format(_T("%f"), m_test->differ); // float -> CString
+		//str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].P); // float -> CString
+		str.Format(_T("%f"), m_test->zrot); // float->CString
 		SetDlgItemText(IDC_EDIT0, str);
 
 		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].omega); // float -> CString
@@ -236,6 +241,8 @@ void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
 		CalculateOmegaAndI(m_test->numOfCraft); // 경사각 i와 승교점 적경 omege 구하기
 
 		CalculateAAndE(m_test->numOfCraft); // 장반경 a와 이심률 e 구하기
+
+		CalculatePeriod(m_test->numOfCraft); // 주기 구하기
 
 		CalculateWAndF(m_test->numOfCraft); // 근지점인수 w와 진근지점이각 f 구하기
 
@@ -319,6 +326,14 @@ int CtrajectoryMFCDlg::CheckTrajShape(int n) {
 		return ellipse;
 }
 
+void CtrajectoryMFCDlg::CalculatePeriod(int n) {
+	double squareP = 0.0;
+
+	squareP = 4.0 * pow((double)m_test->GL_PI, 2) * pow((double)m_test->spaceCraft[n].a, 3);
+	squareP /= (GM * pow(10.0, -9));
+	m_test->spaceCraft[n].P = (GLfloat)sqrt(squareP);
+}
+
 void CtrajectoryMFCDlg::CalculateWAndF(int n) { /// w에 문제가 있다.
 	// f 구하기 (f의 사분면을 아직 고려해야함)
 	int sign = 0;
@@ -394,4 +409,25 @@ void CtrajectoryMFCDlg::AdjustTrajectory(int n) {
 				m_test->spaceCraft[n].w -= 180.0f;
 		}
 	}
+}
+
+
+void CtrajectoryMFCDlg::OnBnClickedButtonFaster()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_test->timeScale /= 2.0f;
+	m_test->realTime *= 2.0f;
+}
+
+
+void CtrajectoryMFCDlg::OnBnClickedButtonSlower()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_test->timeScale *= 2.0f;
+
+	if (m_test->timeScale > 63.38f) {
+		m_test->timeScale = 63.38f;
+	}
+	else
+		m_test->realTime /= 2.0f;
 }
