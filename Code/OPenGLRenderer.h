@@ -16,9 +16,10 @@ typedef struct vecInfo_t {
 	GLfloat u = 0.0f, f = 0.0f, p = 0.0f; // u = w + f , f는 진근지점이각 True anomaly , p는 반직현
 	GLfloat range = 0.0f, velocity = 0.0f; // 초기 거리, 초기 속도
 	GLfloat traj_range = 0.0f, traj_xpos = 0.0f, traj_ypos = 0.0f;  // 궤도를 그리기 위한 변하는 변수들
-	GLfloat angleSpeed = 0.0f; // angle per t
+	GLfloat angleSpeed = 0.0f; // 각속도
 	GLfloat angle = 0.0f; // 변하는 각  (초기각은 f)
 	GLfloat radius = 0.0f; // 변하는 거리 (초기 거리에서 시작)
+	GLfloat P = 0.0f; // 주기
 	GLUquadricObj* craft = NULL;
 }vecInfo_t;
 
@@ -42,6 +43,9 @@ public:
 	// 텍스처 관련 함수
 	AUX_RGBImageRec* LoadBMPFile(char* filename); // 변수에 이미지를 불러오는 함수
 	int LoadGLTextures(); //텍스쳐 작업을 해주는 함수
+
+	//마우스 피킹 관련 함수
+	void SelectObjects(GLuint x, GLuint y); // 물체가 선택됨을 인식하는 함수
 
 
 public:
@@ -69,13 +73,11 @@ public:
 	GLfloat     mass_Sun = 2.0f * (GLfloat)pow(10, 30); // kg
 
 	/// 시간관련 변수
-	GLfloat time = 0.000278f; // 단위시간 지정 (초당 속도를 나타내기 위해) -> 0.000278을 기준으로 초당 각속도를 나타낼 수 있음
+	GLfloat timeScale = 63.38f; // 1초는 63.38 tick 이다. 원래 각속도에 이 값을 나누면 된다. 
 	int currentTime = 0;
 	int oldTime = 0;
 	int deltaTime = 0;
-	int currentTime2 = 0;
-	int oldTime2 = 0;
-	int deltaTime2 = 0;
+	int realTime = 1; // 실제시간과의 배속이 어느정도 인지 보여주는 변수
 
 	CString test;
 
