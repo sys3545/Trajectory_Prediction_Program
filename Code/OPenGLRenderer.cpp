@@ -125,8 +125,8 @@ void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 	spaceCraft[4].xpos = 5.0f;
 	spaceCraft[4].xvel = -2.5f;
 	LoadGLTextures();
+
 	oldTime = glutGet(GLUT_ELAPSED_TIME); //oldTime 값은 초기화과정 맨 마지막에 적용
-	oldTime2 = glutGet(GLUT_ELAPSED_TIME);
 	wglMakeCurrent(m_hdc, NULL);
 }
 
@@ -165,7 +165,6 @@ int OPenGLRenderer::DrawGLScene()
 	glColor3f(0.2f, 0.2f, 1.0f); // 색 지정
 	gluSphere(earth, radius_Earth + (GLfloat)0.05f, 24, 24); // 구를 그림
 	////
-
 	// Blue coordinate (z축 좌표)
 	glColor3f(0, 0, 1);
 	glBegin(GL_LINE_LOOP);
@@ -174,7 +173,7 @@ int OPenGLRenderer::DrawGLScene()
 	glEnd();
 	glPopMatrix(); // 지구 중심좌표 제거
 
-	glPushMatrix(); // 달 그리기 위한 좌표 추가
+	glPushMatrix(); ////// 달 그리기 위한 좌표 추가  /////////
 	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //회전 변환 (z축) (달 공전) , 그리고 회전을 적용
 	glTranslatef(7.0f, 0.0f, 0.0f); // 지구와의 거리만큼 x축에서 이동
@@ -187,6 +186,20 @@ int OPenGLRenderer::DrawGLScene()
 	glColor3f(0.7f, 0.7f, 0.7f);
 	gluSphere(moon, 0.32f, 12, 12);
 	glPopMatrix(); // 달 좌표 제거
+
+	glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
+	glBegin(GL_POINTS);
+	for (GLfloat angle = 0; angle < 360; angle += 0.1f)
+	{
+		moon_xpos = (GLfloat)cos(angle) * 7.0f;
+		moon_ypos = (GLfloat)sin(angle) * 7.0f;
+		glVertex3f(moon_xpos, moon_ypos, moon_zpos);
+	}
+	glEnd();
+	glPopMatrix(); /////// 달 궤도 좌표 제거 ///////
 
 
 	for (int n = 0; n <= numOfCraft; n++) {
@@ -208,50 +221,20 @@ int OPenGLRenderer::DrawGLScene()
 		}
 	}
 
-	glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
-	glBegin(GL_POINTS);
-	for (GLfloat angle = 0; angle < 360; angle += 0.1f)
-	{
-		moon_xpos = (GLfloat)cos(angle) * 7.0f;
-		moon_ypos = (GLfloat)sin(angle) * 7.0f;
-		glVertex3f(moon_xpos, moon_ypos, moon_zpos);
-	}
-	glEnd();
-	glPopMatrix(); // 달 궤도 좌표 제거
-
-	/*///////
-	glPushMatrix(); // 테스트 물체 좌표 추가
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glTranslatef(0.0f, 0.0f, -20.0f); // 먼저 원점을 지구와 맞춰줌
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
-	glTranslatef(spaceCraft[4].xpos, 0.0f, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
-	gluQuadricDrawStyle(spaceCraft[4].craft, GLU_FILL); // 객체를 채우는 형태로 설정
-	glColor3f(0.35f, 0.35f, 0.35f);
-	gluSphere(spaceCraft[4].craft, 0.3f, 12, 12);
-
-	gluQuadricDrawStyle(spaceCraft[4].craft, GLU_LINE); // 선을 긋는 형태로 설정
-	glColor3f(0.7f, 0.7f, 0.7f);
-	gluSphere(spaceCraft[4].craft, 0.32f, 12, 12);
-	glPopMatrix(); // 테스트 물체 좌표 제거
-
-	spaceCraft[4].xpos += spaceCraft[4].xvel * 0.0175f; // 이러면 딱 km/s 가 나온다
-	if (spaceCraft[4].xpos < 0.0f) spaceCraft[4].xpos = 5.0f;
-	///////*/
-
 	glFlush();
 
-	zrot += 0.5f;
-	if (zrot > 359.5f) zrot = 0.0f;
+	// 지구 자전 속도
+	zrot += 360.0f / 87840.0f / timeScale;
+	if (zrot > 360.0f) {
+		zrot -= 360.0f;
+		currentTime = glutGet(GLUT_ELAPSED_TIME);
+		deltaTime = currentTime - oldTime;
+		oldTime = currentTime;
+	}
 
 	moon_zrot += 1.0f;
 	if (moon_zrot > 359.0f) {
 		moon_zrot = 0.0f;
-		currentTime2 = glutGet(GLUT_ELAPSED_TIME); // 시간 간격 얻기
-		deltaTime2 = currentTime2 - oldTime2;
-		oldTime2 = currentTime2; /// 달의 주기 확인 결과( 1 tick = 0.018333 s )
 	}
 
 	return TRUE;
@@ -357,9 +340,12 @@ void OPenGLRenderer::DrawSphere(int num) {
 
 	// Update values
 	spaceCraft[num].angleSpeed = spaceCraft[num].h / (GLfloat)pow((double)spaceCraft[num].radius, 2); // 각속도 구하기
-	spaceCraft[num].angle += (spaceCraft[num].angleSpeed * 180.0f) / GL_PI; // 각속도 적용
+	spaceCraft[num].angle += (spaceCraft[num].angleSpeed * 180.0f) / GL_PI / timeScale; // 각속도 적용
 	
 	spaceCraft[num].radius = (GLfloat)(spaceCraft[num].p / (1 + spaceCraft[num].e * cos(spaceCraft[num].angle * GL_PI / 180.0f)));
+	if (spaceCraft[num].angle > 360.0f) {
+		spaceCraft[num].angle -= 360.0f;
+	}
 }
 
 
@@ -416,4 +402,9 @@ BOOL OPenGLRenderer::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) // 화�
 	if (zoom > -20.0f) zoom = -20.0f;
 
 	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+void OPenGLRenderer::SelectObjects(GLuint x, GLuint y) // 마우스 객체 피킹 인식 함수
+{
+
 }
