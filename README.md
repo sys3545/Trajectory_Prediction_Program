@@ -21,13 +21,13 @@ Time unit problem have to be solved in next version.
 Released version 0.0.5 (2021 03 10) :   
 we can calculate omega and inclination , Time unit problem was solved (but it's not perfect yet)   
    
-Released version 0.0.5 (2021 03 14) :   
+Released version 0.0.6 (2021 03 14) :   
 Trajectory drawing is done , but w, f are not perfect yet.   
 
 Released version 0.1.0 (2021 03 18) :   
 Trajectory drawing is almost perfect.More cases should be checked.    
 Mouse control is possible.   
    
-Released version 0.1.0 (2021 03 21) :   
+Released version 0.1.1 (2021 03 21) :   
 SpaceCrafts selection is possible.
     
