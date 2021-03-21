@@ -121,9 +121,6 @@ void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 	zoom = -30.0f; // 초기 줌 정도 설정
 	earth = gluNewQuadric(); // 지구 객체 인스턴스 생성
 	moon = gluNewQuadric(); // 달 객체 인스턴스 생성
-	spaceCraft[4].craft = gluNewQuadric();
-	spaceCraft[4].xpos = 5.0f;
-	spaceCraft[4].xvel = -2.5f;
 	LoadGLTextures();
 
 	oldTime = glutGet(GLUT_ELAPSED_TIME); //oldTime 값은 초기화과정 맨 마지막에 적용
@@ -164,7 +161,7 @@ int OPenGLRenderer::DrawGLScene()
 	gluQuadricDrawStyle(earth, GLU_LINE); // 선을 긋는 형태로 설정
 	glColor3f(0.2f, 0.2f, 1.0f); // 색 지정
 	gluSphere(earth, radius_Earth + (GLfloat)0.05f, 24, 24); // 구를 그림
-	////
+
 	// Blue coordinate (z축 좌표)
 	glColor3f(0, 0, 1);
 	glBegin(GL_LINE_LOOP);
@@ -335,7 +332,10 @@ void OPenGLRenderer::DrawSphere(int num) {
 	gluSphere(spaceCraft[num].craft, 0.3f, 12, 12);
 
 	gluQuadricDrawStyle(spaceCraft[num].craft, GLU_LINE); // 선을 긋는 형태로 설정
-	glColor3f(0.7f, 0.7f, 0.7f);
+	if(spaceCraft[num].isSelected == 0)
+		glColor3f(0.7f, 0.7f, 0.7f);
+	else
+		glColor3f(0.9f, 0.0f, 0.0f);
 	gluSphere(spaceCraft[num].craft, 0.32f, 12, 12);
 
 	// Update values
@@ -352,10 +352,11 @@ void OPenGLRenderer::DrawSphere(int num) {
 void OPenGLRenderer::OnLButtonDown(UINT nFlags, CPoint point) // 클릭하면 클릭 시의 마우스 위치가 저장된다.
 {
 	GLfloat x;
+	GLfloat y;
 
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	b_Rotate = TRUE; // 회전모드 시작
-	x = point.x;
+	x = (GLfloat)point.x;
 	mousePoint = x;
 
 	CWnd::OnLButtonDown(nFlags, point);
@@ -368,7 +369,7 @@ void OPenGLRenderer::OnMouseMove(UINT nFlags, CPoint point)
 	GLfloat x;
 	
 
-	x = point.x;
+	x = (GLfloat)point.x;
 	if (b_Rotate) {
 		differ = x - mousePoint;
 	}
@@ -402,9 +403,4 @@ BOOL OPenGLRenderer::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) // 화�
 	if (zoom > -20.0f) zoom = -20.0f;
 
 	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
-}
-
-void OPenGLRenderer::SelectObjects(GLuint x, GLuint y) // 마우스 객체 피킹 인식 함수
-{
-
 }
