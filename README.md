@@ -27,4 +27,7 @@ Trajectory drawing is done , but w, f are not perfect yet.
 Released version 0.1.0 (2021 03 18) :   
 Trajectory drawing is almost perfect.More cases should be checked.    
 Mouse control is possible.   
+   
+Released version 0.1.0 (2021 03 21) :   
+SpaceCrafts selection is possible.
     
