@@ -61,6 +61,7 @@ void CtrajectoryMFCDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_STATIC_PICTURE, m_pLeft);
+	DDX_Control(pDX, IDC_LIST, m_List);
 }
 
 BEGIN_MESSAGE_MAP(CtrajectoryMFCDlg, CDialogEx)
@@ -111,7 +112,6 @@ BOOL CtrajectoryMFCDlg::OnInitDialog()
 	SetTimer(1000, 10, NULL);
 
 	// OpenGL 생성 및 초기화 작업
-	//CRect rectLeft;
 	int iWidth, iHeight;
 
 	m_pLeft.GetWindowRect(rectLeft);
@@ -126,6 +126,11 @@ BOOL CtrajectoryMFCDlg::OnInitDialog()
 	m_test->CreateGLContext(rectLeft, this);
 	m_test->PrepareScene(0, 0, iWidth, iHeight); //will show without this but as black & white.
 	m_test->SetTimer(1, 10, 0);
+
+	// 리스트 컨트롤 관련 작업
+	m_List.GetWindowRect(&rectList); // 크기를 담는다.
+	m_List.SetExtendedStyle(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
+	m_List.InsertColumn(0, _T("Select SpaceCraft"), LVCFMT_LEFT, rectList.Width()); // Column 추가
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -190,8 +195,7 @@ void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 	SetDlgItemText(IDC_EDIT_TIME, str);
 	
 	if (m_test->numOfCraft >= 1) {
-		//str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].P); // float -> CString
-		str.Format(_T("%f"), m_test->zrot); // float->CString
+		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].P); // float -> CString
 		SetDlgItemText(IDC_EDIT0, str);
 
 		str.Format(_T("%f"), m_test->spaceCraft[(m_test->numOfCraft) - 1].omega); // float -> CString
@@ -213,6 +217,13 @@ void CtrajectoryMFCDlg::OnTimer(UINT_PTR nIDEvent)
 		SetDlgItemText(IDC_EDIT6, str);
 	}
 
+	for (int i = 0; i < m_test->numOfCraft; i++) { // 리스트에서 선택한 객체의 색을 바꿔줌
+		if (m_List.GetItemState(i, LVIS_SELECTED) != 0)
+			m_test->spaceCraft[i].isSelected = 1;
+		else
+			m_test->spaceCraft[i].isSelected = 0;
+	}
+
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -221,7 +232,7 @@ void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
 	GM = m_test->G * m_test->mass_Earth; // 기준을 지구? 태양? 으로 할지 설정
 
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	if (m_test->numOfCraft <= 9) { // 물체는 5개까지 추가가능
+	if (m_test->numOfCraft <= 4) { // 물체는 5개까지 추가가능
 		GetDlgItemText(IDC_EDIT_XPOS, xpos); // XPOS 텍스트박스에 적힌 값을 xpos에 저장
 		GetDlgItemText(IDC_EDIT_YPOS, ypos);
 		GetDlgItemText(IDC_EDIT_ZPOS, zpos);
@@ -250,8 +261,13 @@ void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
 
 		AdjustTrajectory(m_test->numOfCraft); // 방향에 따른 궤도를 보정을 해줘야함
 
+		AddtoList(m_test->numOfCraft);
+
 		m_test->CreateCraft(m_test->numOfCraft); // 우주물체 생성
 		m_test->numOfCraft++; // 개체수 증가
+	}
+	else {
+		MessageBox(_T("Full of space crafts."), _T("Caution"), MB_ICONWARNING);
 	}
 }
 
@@ -394,7 +410,7 @@ void CtrajectoryMFCDlg::CanMakeCircle(int n) { // 제1 우주 속도를 만족�
 
 	m_test->spaceCraft[n].angle = m_test->spaceCraft[n].f; // f를 초기각으로 설정
 }
-
+ 
 void CtrajectoryMFCDlg::AdjustTrajectory(int n) {
 	
 	if (m_test->spaceCraft[n].xvel != 0.0f && m_test->spaceCraft[n].yvel != 0.0f) 
@@ -403,7 +419,7 @@ void CtrajectoryMFCDlg::AdjustTrajectory(int n) {
 		{
 			m_test->spaceCraft[n].omega += 90.0f;
 			m_test->spaceCraft[n].w += 90.0f;
-			if (m_test->spaceCraft[n].xpos * m_test->spaceCraft[n].ypos > 0)
+			if (m_test->spaceCraft[n].xpos * m_test->spaceCraft[n].ypos > 0) // 여기에 해당하는 구간에서 속도가 반대로 가는 문제발생
 				m_test->spaceCraft[n].i += 90.0f;
 			if (m_test->spaceCraft[n].ypos > 0)
 				m_test->spaceCraft[n].w -= 180.0f;
@@ -416,7 +432,7 @@ void CtrajectoryMFCDlg::OnBnClickedButtonFaster()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	m_test->timeScale /= 2.0f;
-	m_test->realTime *= 2.0f;
+	m_test->realTime *= 2;
 }
 
 
@@ -429,5 +445,15 @@ void CtrajectoryMFCDlg::OnBnClickedButtonSlower()
 		m_test->timeScale = 63.38f;
 	}
 	else
-		m_test->realTime /= 2.0f;
+		m_test->realTime /= 2;
+}
+
+void CtrajectoryMFCDlg::AddtoList(int n) // 리스트에 추가
+{ 
+	CString strN;
+
+	strN.Format(_T("%d"), n);
+
+	m_List.InsertItem(n, strN);
+
 }
