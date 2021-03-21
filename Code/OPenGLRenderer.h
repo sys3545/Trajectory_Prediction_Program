@@ -16,10 +16,9 @@ typedef struct vecInfo_t {
 	GLfloat u = 0.0f, f = 0.0f, p = 0.0f; // u = w + f , f는 진근지점이각 True anomaly , p는 반직현
 	GLfloat range = 0.0f, velocity = 0.0f; // 초기 거리, 초기 속도
 	GLfloat traj_range = 0.0f, traj_xpos = 0.0f, traj_ypos = 0.0f;  // 궤도를 그리기 위한 변하는 변수들
-	GLfloat angleSpeed = 0.0f; // 각속도
-	GLfloat angle = 0.0f; // 변하는 각  (초기각은 f)
+	GLfloat angleSpeed = 0.0f, angle = 0.0f, P = 0.0f; // 각속도, 변하는 각  (초기각은 f) , 주기
 	GLfloat radius = 0.0f; // 변하는 거리 (초기 거리에서 시작)
-	GLfloat P = 0.0f; // 주기
+	GLint isSelected = 0;
 	GLUquadricObj* craft = NULL;
 }vecInfo_t;
 
@@ -44,10 +43,6 @@ public:
 	AUX_RGBImageRec* LoadBMPFile(char* filename); // 변수에 이미지를 불러오는 함수
 	int LoadGLTextures(); //텍스쳐 작업을 해주는 함수
 
-	//마우스 피킹 관련 함수
-	void SelectObjects(GLuint x, GLuint y); // 물체가 선택됨을 인식하는 함수
-
-
 public:
 	// 지구의 성분
 	GLfloat		zrot = 0; // 지구 자전 속도
@@ -65,7 +60,7 @@ public:
 
 	GLUquadricObj* earth = NULL; // 지구 객체
 	GLUquadricObj* moon = NULL; // 달 객체
-	vecInfo_t spaceCraft[5]; // 우주물체 객체
+	vecInfo_t spaceCraft[6]; // 우주물체 객체
 	int numOfCraft = 0; // 우주물체 갯수
 
 	/// 수식에 필요한 변수선언
