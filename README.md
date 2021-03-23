@@ -1,7 +1,7 @@
 # Trajectory_Prediction
 The repository for Trajectory Prediction program in Two-Body Problem 
    
-# Example Screen (0.1.2)   
+# Example Screen (version 0.1.2)   
 ![capture1](https://user-images.githubusercontent.com/61923882/112078834-74893f00-8bc2-11eb-8f1c-360f35180e6d.PNG)
 
 
