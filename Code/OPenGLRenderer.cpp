@@ -275,7 +275,7 @@ int OPenGLRenderer::LoadGLTextures()
 	gluQuadricTexture(earth, GL_TRUE); // 텍스처 매핑 사용
 	memset(pTextureImage, 0, sizeof(void*) * 1); // 포인터 초기화
 
-	if (pTextureImage[0] = LoadBMPFile("earthbmp.bmp")) {
+	if (pTextureImage[0] = LoadBMPFile("earth.bmp")) {
 		Status = TRUE;
 		glGenTextures(1, &textureID[0]); // 텍스쳐 객체 생성
 		glBindTexture(GL_TEXTURE_2D, textureID[0]); // 상태관리자에게 [0]번째 텍스처를 바인딩
@@ -323,7 +323,6 @@ void OPenGLRenderer::DrawSphere(int num) {
 	// 여기서 f만큼 회전한 위치에서 초기 구체 생성
 	spaceCraft[num].xpos = (GLfloat)cos(spaceCraft[num].angle * GL_PI / 180.0f) * spaceCraft[num].radius / 1000.0f;
 	spaceCraft[num].ypos = (GLfloat)sin(spaceCraft[num].angle * GL_PI / 180.0f) * spaceCraft[num].radius / 1000.0f;
-
 
 	// drawing
 	glTranslatef(spaceCraft[num].xpos, spaceCraft[num].ypos, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
