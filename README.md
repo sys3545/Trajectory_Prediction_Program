@@ -2,7 +2,7 @@
 The repository for Trajectory Prediction program in Two-Body Problem 
    
 # Example Screen   
-<img width="893" alt="screen" src="https://user-images.githubusercontent.com/61923882/111413732-2982ae00-8722-11eb-9c42-0fe7df4a94a5.PNG">
+![capture1](https://user-images.githubusercontent.com/61923882/112078834-74893f00-8bc2-11eb-8f1c-360f35180e6d.PNG)
 
 
 # Version
