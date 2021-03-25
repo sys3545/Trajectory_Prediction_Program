@@ -32,4 +32,7 @@ Released version 0.1.1 (2021 03 21) :
 SpaceCrafts selection is possible.
    
 Released version 0.1.2 (2021 03 23) :   
-Texture mapping is perfect.
+Texture mapping is perfect.   
+   
+Released version 0.1.3 (2021 03 25) :   
+Prediction position drawing is done, but not perfect.
