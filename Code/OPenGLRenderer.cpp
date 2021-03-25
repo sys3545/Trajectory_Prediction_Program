@@ -213,8 +213,8 @@ int OPenGLRenderer::DrawGLScene()
 			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
 			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // 이후 z축을 기준으로 omega만큼 회전 (승교점적경 적용)
 			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // 회전된 좌표축에서 x축을 기준으로 i만큼 회전 (궤도경사각 적용)
-			DrawSphere(n);
-			glPopMatrix();// 추가된 우주물체 궤도를 그리기 위한 좌표 삭제
+			DrawSphere(n); // n번째 우주물체를 그림
+			glPopMatrix();// 추가된 우주물체를 그리기 위한 좌표 삭제
 		}
 	}
 
@@ -297,12 +297,14 @@ int OPenGLRenderer::LoadGLTextures()
 }
 
 // 우주물체를 직접적으로 생성하는 함수
-void OPenGLRenderer::CreateCraft(int num) {
+void OPenGLRenderer::CreateCraft(int num) 
+{
 	spaceCraft[num].craft = gluNewQuadric(); // 물체 객체 인스턴스 생성
 }
 
 // 우주물체 궤적을 그려주는 함수
-void OPenGLRenderer::DrawTrajectory(int num) {
+void OPenGLRenderer::DrawTrajectory(int num) 
+{
 	//GLfloat init_w = spaceCraft[num].w;
 	glRotatef(spaceCraft[num].w, 0.0f, 0.0f, 1.0f);
 
@@ -318,7 +320,8 @@ void OPenGLRenderer::DrawTrajectory(int num) {
 }
 
 // 우주물체 구를 그려주는 함수
-void OPenGLRenderer::DrawSphere(int num) {
+void OPenGLRenderer::DrawSphere(int num) 
+{
 	glRotatef(spaceCraft[num].w, 0.0f, 0.0f, 1.0f); // w 만큼 그리는 기준면 회전
 	// 여기서 f만큼 회전한 위치에서 초기 구체 생성
 	spaceCraft[num].xpos = (GLfloat)cos(spaceCraft[num].angle * GL_PI / 180.0f) * spaceCraft[num].radius / 1000.0f;
@@ -337,7 +340,7 @@ void OPenGLRenderer::DrawSphere(int num) {
 		glColor3f(0.9f, 0.0f, 0.0f);
 	gluSphere(spaceCraft[num].craft, 0.32f, 12, 12);
 
-	// Update values
+	/// Update values ///
 	spaceCraft[num].angleSpeed = spaceCraft[num].h / (GLfloat)pow((double)spaceCraft[num].radius, 2); // 각속도 구하기
 	spaceCraft[num].angle += (spaceCraft[num].angleSpeed * 180.0f) / GL_PI / timeScale; // 각속도 적용
 	
@@ -345,13 +348,105 @@ void OPenGLRenderer::DrawSphere(int num) {
 	if (spaceCraft[num].angle > 360.0f) {
 		spaceCraft[num].angle -= 360.0f;
 	}
+
+	CalculateT(num); // 근지점 통과시 업데이트
+	//// Update End ////
+
+	DrawPrediction(num); // 예측 모드 중이면 예측 극좌표에 구를 그려줌
+}
+
+// 근지점 통과 시각을 구하는 함수
+void OPenGLRenderer::CalculateT(int num) 
+{ 
+	GLfloat cosE;
+	GLfloat initialM;
+	GLfloat initialE;
+
+	cosE = (1.0f - (spaceCraft[num].radius / spaceCraft[num].a)) / spaceCraft[num].e;
+	initialE = acosf(cosE);
+
+	initialM = initialE - (spaceCraft[num].e * sinf(initialE));
+
+	spaceCraft[num].T = -initialM / spaceCraft[num].n;
+
+	if (spaceCraft[num].angle >= 0.0f && spaceCraft[num].angle <= 180.0f)
+		spaceCraft[num].T = spaceCraft[num].P + spaceCraft[num].T;
+	else
+		spaceCraft[num].T = -spaceCraft[num].T;
+}
+
+// 예측 극좌표를 구하는 함수
+void OPenGLRenderer::PredictionPosition(int num, GLfloat time) 
+{
+	const int repeat = 4;
+	GLfloat M[repeat]; // M0, M1, M2, M3 
+	GLfloat E[repeat]; // E0, E1, E2, E3
+	GLfloat deltaE;
+	GLfloat tanHalf_F;
+
+	if (time >= spaceCraft[num].T)
+		spaceCraft[num].M = spaceCraft[num].n * (time - spaceCraft[num].T);
+	else
+		spaceCraft[num].M = spaceCraft[num].n * (time + spaceCraft[num].P - spaceCraft[num].T);
+
+	E[0] = spaceCraft[num].M; // E0 = M0 근사
+	for (int i = 0; i < repeat; i++) {
+		M[i] = E[i] - (spaceCraft[num].e * sinf(E[i]));
+		deltaE = (spaceCraft[num].M - M[i]) / (1 - spaceCraft[num].e * cosf(E[0]));
+		
+		if(i < repeat-1)
+			E[i + 1] = E[i] + deltaE;
+	}
+	spaceCraft[num].M = M[repeat - 1];
+	spaceCraft[num].E = E[repeat - 1];
+
+	spaceCraft[num].preRadius = spaceCraft[num].a * (1 - (spaceCraft[num].e * cosf(spaceCraft[num].E))); // r
+	tanHalf_F = sqrtf((1 + spaceCraft[num].e) / (1 - spaceCraft[num].e)) * tanf(spaceCraft[num].E / 2.0f); // tan(f/2)
+	spaceCraft[num].preF = 2.0f * atanf(tanHalf_F) * 180.0f / GL_PI; // f
+
+	if (spaceCraft[num].preF < 0) {
+		spaceCraft[num].preF = 360.0f + spaceCraft[num].preF;
+	}
+}
+
+void OPenGLRenderer::CreatPreCraft(int num)
+{
+	preCraft[num] = gluNewQuadric(); // 물체 객체 인스턴스 생성
+}
+
+// 예측 극좌표에 그려주는 함수
+void OPenGLRenderer::DrawPrediction(int num)
+{
+	GLfloat preX;
+	GLfloat preY;
+	
+	if (spaceCraft[num].isSelected == 1 && spaceCraft[num].isStarted == 1) {
+		if (preCraft[num] != NULL) {
+			glPushMatrix();
+			preX = (GLfloat)cos(spaceCraft[num].preF * GL_PI / 180.0f) * spaceCraft[num].preRadius / 1000.0f;
+			preY = (GLfloat)sin(spaceCraft[num].preF * GL_PI / 180.0f) * spaceCraft[num].preRadius / 1000.0f;
+
+			// drawing
+			glTranslatef(preX, preY, 0.0f); // 구체 이동 (방정식에 따라 이 포지션이 바뀐다)
+			gluQuadricDrawStyle(preCraft[num], GLU_FILL); // 객체를 채우는 형태로 설정
+			glColor3f(0.35f, 0.35f, 0.35f);
+			gluSphere(preCraft[num], 0.3f, 12, 12);
+
+			gluQuadricDrawStyle(preCraft[num], GLU_LINE); // 선을 긋는 형태로 설정
+			glColor3f(0.0f, 0.8f, 0.0f);
+			gluSphere(preCraft[num], 0.32f, 12, 12);
+			glPopMatrix();
+		}
+	}
+	//update pre F //
+
 }
 
 
+///// user input functions /////
 void OPenGLRenderer::OnLButtonDown(UINT nFlags, CPoint point) // 클릭하면 클릭 시의 마우스 위치가 저장된다.
 {
 	GLfloat x;
-	GLfloat y;
 
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	b_Rotate = TRUE; // 회전모드 시작
