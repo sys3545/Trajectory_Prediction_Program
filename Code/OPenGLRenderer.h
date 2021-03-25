@@ -13,12 +13,14 @@ typedef struct vecInfo_t {
 	GLfloat xvel = 0.0f, yvel = 0.0f, zvel = 0.0f;
 	GLfloat C1 = 0.0f, C2 = 0.0f, C3 = 0.0f, h = 0.0f;
 	GLfloat i = 0.0f, omega = 0.0f, a = 0.0f, e = 0.0f, w = 0.0f, T = 0.0f; // 궤도의 6요소
+	GLfloat n = 0.0f, M = 0.0f, E = 0.0f, preRadius = 0.0f, preF = 0.0f; // n : mean motion, M : mean anomaly, E : eccentric anomaly
 	GLfloat u = 0.0f, f = 0.0f, p = 0.0f; // u = w + f , f는 진근지점이각 True anomaly , p는 반직현
 	GLfloat range = 0.0f, velocity = 0.0f; // 초기 거리, 초기 속도
 	GLfloat traj_range = 0.0f, traj_xpos = 0.0f, traj_ypos = 0.0f;  // 궤도를 그리기 위한 변하는 변수들
 	GLfloat angleSpeed = 0.0f, angle = 0.0f, P = 0.0f; // 각속도, 변하는 각  (초기각은 f) , 주기
 	GLfloat radius = 0.0f; // 변하는 거리 (초기 거리에서 시작)
-	GLint isSelected = 0;
+	GLint isSelected = 0; // 선택이 되었는가?
+	GLint isStarted = 0; // 예측 모드가 시작 되었는가?
 	GLUquadricObj* craft = NULL;
 }vecInfo_t;
 
@@ -51,9 +53,7 @@ public:
 	double      G = 6.673 * pow(10, -11); // m^3/kg/s^2 (중력상수)
 
 	// 달 회전 성분
-	GLfloat		moon_xrot = 0;
-	GLfloat		moon_yrot = 0;
-	GLfloat		moon_zrot = 0;
+	GLfloat		moon_zrot = 0; // 달 공전 속도
 	GLfloat		moon_xpos = 7.0f; // 지구와 달거리
 	GLfloat		moon_ypos = 0;
 	GLfloat		moon_zpos = 0;
@@ -62,6 +62,7 @@ public:
 	GLUquadricObj* moon = NULL; // 달 객체
 	vecInfo_t spaceCraft[6]; // 우주물체 객체
 	int numOfCraft = 0; // 우주물체 갯수
+	GLUquadricObj* preCraft[6]; // 예측궤도 그릴시에 사용할 객체
 
 	/// 수식에 필요한 변수선언
 	GLfloat		GL_PI = (GLfloat)3.141592;
@@ -85,7 +86,13 @@ public:
 	GLfloat mousePoint; // 마우스 위치를 잡는 변수
 	GLfloat differ; // 마우스가 움직인 정도
 	GLfloat zAngle = 0.0f; // 화면 회전 각도
-	GLfloat zoom = 0.0f;
+	GLfloat zoom = 0.0f; // 줌 정도
+
+	// 궤도 예측 관련 함수
+	void PredictionPosition(int num, GLfloat time); // mean motion, E 등을 이용하여 일정시간 뒤의 선택된 물체의 위치를 구하는 함수
+	void DrawPrediction(int num); // 예측 극좌표 결과를 그려주는 함수
+	void CalculateT(int num); // 근지점 통과시를 구하는 함수 (초 단위)
+	void CreatPreCraft(int num); // 예측 물체의 객체를 생성하는 함수
 
 protected:
 	bool InitContext(CWnd* parent);					 // Creates OpenGL Rendering Context
