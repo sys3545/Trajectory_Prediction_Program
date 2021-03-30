@@ -264,6 +264,11 @@ void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
 
 		CalculateAAndE(m_test->numOfCraft); // 장반경 a와 이심률 e 구하기
 
+		if (m_test->spaceCraft[m_test->numOfCraft].type == 2) { // 쌍곡선 궤도는 생성 불가
+			MessageBox(_T("The space craft will escape the earth."), _T("Caution"), MB_ICONWARNING);
+			return;
+		}
+
 		CalculatePeriod(m_test->numOfCraft); // 주기 구하기
 
 		CalculateWAndF(m_test->numOfCraft); // 근지점인수 w와 진근지점이각 f 구하기
@@ -317,9 +322,9 @@ void CtrajectoryMFCDlg::CalculateAAndE(int n) { // a e p 구함
 	m_test->spaceCraft[n].radius = m_test->spaceCraft[n].range;
 
 	// 속도벡터의 크기를 이용해서 장반경을 구하기 전에 타원궤도인지 쌍곡선궤도인지 알아야함
-	int type = 0;
-	type = CheckTrajShape(n);
-	if (type == 1) { // 타원궤도
+	
+	m_test->spaceCraft[n].type = CheckTrajShape(n);
+	if (m_test->spaceCraft[n].type == 1) { // 타원궤도
 		reciprocal_a = (2.0 / (1000.0 * (double)(m_test->spaceCraft[n].range))) - ((double)pow(1000.0 * m_test->spaceCraft[n].velocity, 2) / GM);// 태양으로 임시설정(지구예제는 나중에) (km->m)
 	}
 	else { // 쌍곡선궤도
@@ -331,7 +336,7 @@ void CtrajectoryMFCDlg::CalculateAAndE(int n) { // a e p 구함
 	square = 1 - (squarh / (GM * pow(10, -9) * m_test->spaceCraft[n].a)); // GM을 pow(10,-9)를 통해 km로 맞춰줌
 	m_test->spaceCraft[n].e = (GLfloat)sqrt(square);
 
-	if (type == 1) { // 타원궤도
+	if (m_test->spaceCraft[n].type == 1) { // 타원궤도
 		m_test->spaceCraft[n].p = m_test->spaceCraft[n].a * (1 - (GLfloat)pow(m_test->spaceCraft[n].e, 2));
 	}
 	else { // 쌍곡선궤도
@@ -486,7 +491,7 @@ void CtrajectoryMFCDlg::OnBnClickedButtonPrediction()
 			m_test->spaceCraft[i].isStarted = 1; // 예측이 시작됨을 알림
 			m_test->CreatPreCraft(i);
 
-			str.Format(_T("%f"), m_test->spaceCraft[i].preF); // float -> CString
+			str.Format(_T("%f"), m_test->spaceCraft[i].preRadius); // float -> CString
 			SetDlgItemText(IDC_EDIT0, str);
 		}
 	}
