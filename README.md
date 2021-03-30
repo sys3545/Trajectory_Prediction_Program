@@ -36,3 +36,7 @@ Texture mapping is perfect.
    
 Released version 0.1.3 (2021 03 25) :   
 Prediction position drawing is done, but not perfect.
+   
+Released version 0.1.3 (2021 03 30) :   
+Prediction position drawing is perfect. warning window was added.   
+   
