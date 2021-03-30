@@ -215,6 +215,13 @@ int OPenGLRenderer::DrawGLScene()
 			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // 회전된 좌표축에서 x축을 기준으로 i만큼 회전 (궤도경사각 적용)
 			DrawSphere(n); // n번째 우주물체를 그림
 			glPopMatrix();// 추가된 우주물체를 그리기 위한 좌표 삭제
+
+			glPushMatrix(); // 예측 위치의 물체를 그리기 위한 좌표 추가
+			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
+			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // 이후 z축을 기준으로 omega만큼 회전 (승교점적경 적용)
+			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // 회전된 좌표축에서 x축을 기준으로 i만큼 회전 (궤도경사각 적용)
+			DrawPrediction(n); // 예측 모드 중이면 예측 극좌표에 구를 그려줌
+			glPopMatrix(); // 예측 위치의 물체를 그리기 위한 좌표 제거
 		}
 	}
 
@@ -351,8 +358,6 @@ void OPenGLRenderer::DrawSphere(int num)
 
 	CalculateT(num); // 근지점 통과시 업데이트
 	//// Update End ////
-
-	DrawPrediction(num); // 예측 모드 중이면 예측 극좌표에 구를 그려줌
 }
 
 // 근지점 통과 시각을 구하는 함수
@@ -422,7 +427,6 @@ void OPenGLRenderer::DrawPrediction(int num)
 	
 	if (spaceCraft[num].isSelected == 1 && spaceCraft[num].isStarted == 1) {
 		if (preCraft[num] != NULL) {
-			glPushMatrix();
 			preX = (GLfloat)cos(spaceCraft[num].preF * GL_PI / 180.0f) * spaceCraft[num].preRadius / 1000.0f;
 			preY = (GLfloat)sin(spaceCraft[num].preF * GL_PI / 180.0f) * spaceCraft[num].preRadius / 1000.0f;
 
@@ -435,11 +439,9 @@ void OPenGLRenderer::DrawPrediction(int num)
 			gluQuadricDrawStyle(preCraft[num], GLU_LINE); // 선을 긋는 형태로 설정
 			glColor3f(0.0f, 0.8f, 0.0f);
 			gluSphere(preCraft[num], 0.32f, 12, 12);
-			glPopMatrix();
 		}
 	}
 	//update pre F //
-
 }
 
 
