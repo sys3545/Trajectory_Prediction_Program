@@ -21,6 +21,7 @@ typedef struct vecInfo_t {
 	GLfloat radius = 0.0f; // 변하는 거리 (초기 거리에서 시작)
 	GLint isSelected = 0; // 선택이 되었는가?
 	GLint isStarted = 0; // 예측 모드가 시작 되었는가?
+	GLint type = 0; // 궤도 형태 (1.타원, 2.쌍곡선)
 	GLUquadricObj* craft = NULL;
 }vecInfo_t;
 
