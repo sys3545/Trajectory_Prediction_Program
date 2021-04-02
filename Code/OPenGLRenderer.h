@@ -83,7 +83,7 @@ public:
 	GLuint textureID[1]; // 텍스처의 핸들을 저장하는 배열
 
 	// 마우스 입력시 회전 변수
-	BOOL b_Rotate; // 마우스 상태에 따른 회전을 감지
+	BOOL b_Rotate = FALSE; // 마우스 상태에 따른 회전을 감지
 	GLfloat mousePoint; // 마우스 위치를 잡는 변수
 	GLfloat differ; // 마우스가 움직인 정도
 	GLfloat zAngle = 0.0f; // 화면 회전 각도
