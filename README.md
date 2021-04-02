@@ -2,8 +2,7 @@
 The repository for Trajectory Prediction program in Two-Body Problem 
    
 # Example Screen (version 0.1.2)   
-![capture1](https://user-images.githubusercontent.com/61923882/112078834-74893f00-8bc2-11eb-8f1c-360f35180e6d.PNG)
-
+![capture2](https://user-images.githubusercontent.com/61923882/113384554-40cbc780-93c1-11eb-934a-0a14547de7a5.PNG)
 
 # Versions
 Released version 0.0.1 (2021 03 05) :   
