@@ -220,13 +220,14 @@ int OPenGLRenderer::DrawGLScene()
 			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
 			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // 이후 z축을 기준으로 omega만큼 회전 (승교점적경 적용)
 			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // 회전된 좌표축에서 x축을 기준으로 i만큼 회전 (궤도경사각 적용)
+			glRotatef(spaceCraft[n].w, 0.0f, 0.0f, 1.0f);
 			DrawPrediction(n); // 예측 모드 중이면 예측 극좌표에 구를 그려줌
 			glPopMatrix(); // 예측 위치의 물체를 그리기 위한 좌표 제거
 		}
 	}
-
+	
 	glFlush();
-
+	
 	// 지구 자전 속도
 	zrot += 360.0f / 87840.0f / timeScale;
 	if (zrot > 360.0f) {
@@ -342,7 +343,7 @@ void OPenGLRenderer::DrawSphere(int num)
 
 	gluQuadricDrawStyle(spaceCraft[num].craft, GLU_LINE); // 선을 긋는 형태로 설정
 	if(spaceCraft[num].isSelected == 0)
-		glColor3f(0.7f, 0.7f, 0.7f);
+		glColor3f(0.4f, 0.4f, 0.8f);
 	else
 		glColor3f(0.9f, 0.0f, 0.0f);
 	gluSphere(spaceCraft[num].craft, 0.32f, 12, 12);
@@ -437,11 +438,10 @@ void OPenGLRenderer::DrawPrediction(int num)
 			gluSphere(preCraft[num], 0.3f, 12, 12);
 
 			gluQuadricDrawStyle(preCraft[num], GLU_LINE); // 선을 긋는 형태로 설정
-			glColor3f(0.0f, 0.8f, 0.0f);
+			glColor3f(0.7f, 0.7f, 0.7f);
 			gluSphere(preCraft[num], 0.32f, 12, 12);
 		}
 	}
-	//update pre F //
 }
 
 
@@ -464,12 +464,12 @@ void OPenGLRenderer::OnMouseMove(UINT nFlags, CPoint point)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	GLfloat x;
 	
-
 	x = (GLfloat)point.x;
 	if (b_Rotate) {
 		differ = x - mousePoint;
 	}
-
+	mousePoint = x;
+	differ *= 40.0f; // 회전 민감도
 	zAngle += differ/100.0f;
 
 	if (zAngle > 359.0f || zAngle < -359.0f) zAngle = 0.0f;
