@@ -40,3 +40,5 @@ Prediction position drawing is done, but not perfect.
 Released version 0.1.4 (2021 03 30) :   
 Prediction position drawing is perfect. warning window was added.   
    
+Released version 0.1.5 (2021 04 02) :   
+Screen rotation is perfect.   
