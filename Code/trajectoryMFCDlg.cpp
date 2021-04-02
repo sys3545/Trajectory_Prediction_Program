@@ -232,7 +232,7 @@ void CtrajectoryMFCDlg::printInfo(int n)
 	SetDlgItemText(IDC_EDIT5, str);
 
 	str.Format(_T("%f"), m_test->spaceCraft[n].angle); // float -> CString
-	SetDlgItemText(IDC_EDIT6, str);
+	SetDlgItemText(IDC_EDIT_F, str);
 
 	str.Format(_T("%f"), m_test->spaceCraft[n].T); // float -> CString
 	SetDlgItemText(IDC_EDIT7, str);
