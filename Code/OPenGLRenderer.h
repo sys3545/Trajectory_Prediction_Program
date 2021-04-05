@@ -76,7 +76,10 @@ public:
 	int deltaTime = 0;
 	int realTime = 1; // 실제시간과의 배속이 어느정도 인지 보여주는 변수
 
-	CString test;
+	CString test; // 깃 데스크탑 테스트 //
+	GLdouble wx = 0.0;
+	GLdouble wy = 0.0;
+	GLdouble wz = 0.0;
 
 	// 텍스처 관련 변수
 	AUX_RGBImageRec* pTextureImage[1]; // 이미지 파일에 대한 정보를 가지고 있는 배열
@@ -94,6 +97,7 @@ public:
 	void DrawPrediction(int num); // 예측 극좌표 결과를 그려주는 함수
 	void CalculateT(int num); // 근지점 통과시를 구하는 함수 (초 단위)
 	void CreatPreCraft(int num); // 예측 물체의 객체를 생성하는 함수
+	void unProject(CPoint point); // 스크린 좌표를 월드좌표로 변환
 
 protected:
 	bool InitContext(CWnd* parent);					 // Creates OpenGL Rendering Context
