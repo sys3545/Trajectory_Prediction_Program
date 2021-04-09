@@ -41,3 +41,7 @@ Prediction position drawing is perfect. warning window was added.
    
 Released version 0.1.5 (2021 04 02) :   
 Screen rotation is perfect.   
+   
+Released version 0.1.6 (2021 04 09) :   
+Hyperbola orbit drawing is done.   
+Prediction position drawing is updated within everytime.   
