@@ -14,7 +14,7 @@ END_MESSAGE_MAP()
 
 void OPenGLRenderer::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: ¿©±â¿¡ ¸Ş½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº»°ªÀ» È£ÃâÇÕ´Ï´Ù.
+	// TODO: ì—¬ê¸°ì— ë©”ì‹œì§€ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€ ë°/ë˜ëŠ” ê¸°ë³¸ê°’ì„ í˜¸ì¶œí•©ë‹ˆë‹¤.
 	switch (nIDEvent)
 	{
 	case 1:
@@ -51,7 +51,7 @@ bool OPenGLRenderer::CreateGLContext(CRect rect, CWnd* parent)
 	return true;
 }
 
-// ÄÁÅØ½ºÆ® ÃÊ±âÈ­
+// ì»¨í…ìŠ¤íŠ¸ ì´ˆê¸°í™”
 bool OPenGLRenderer::InitContext(CWnd* parent)
 {
 	int bits = 16;
@@ -95,7 +95,7 @@ bool OPenGLRenderer::InitContext(CWnd* parent)
 	return true;
 }
 
-// ÃÊ±â ¾À ÁØºñ
+// ì´ˆê¸° ì”¬ ì¤€ë¹„
 void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 {
 	glClearColor(0.0, 0.0, 1.0, 0.0); //background to clear with.
@@ -116,18 +116,18 @@ void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glEnable(GL_DEPTH_TEST); // ±íÀÌ ¹öÆÛ¸¦ »ç¿ëÇÒ °ÍÀ» ¾Ë¸²
+	glEnable(GL_DEPTH_TEST); // ê¹Šì´ ë²„í¼ë¥¼ ì‚¬ìš©í•  ê²ƒì„ ì•Œë¦¼
 
-	zoom = -30.0f; // ÃÊ±â ÁÜ Á¤µµ ¼³Á¤
-	earth = gluNewQuadric(); // Áö±¸ °´Ã¼ ÀÎ½ºÅÏ½º »ı¼º
-	moon = gluNewQuadric(); // ´Ş °´Ã¼ ÀÎ½ºÅÏ½º »ı¼º
+	zoom = -30.0f; // ì´ˆê¸° ì¤Œ ì •ë„ ì„¤ì •
+	earth = gluNewQuadric(); // ì§€êµ¬ ê°ì²´ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
+	moon = gluNewQuadric(); // ë‹¬ ê°ì²´ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
 	LoadGLTextures();
 
-	oldTime = glutGet(GLUT_ELAPSED_TIME); //oldTime °ªÀº ÃÊ±âÈ­°úÁ¤ ¸Ç ¸¶Áö¸·¿¡ Àû¿ë
+	oldTime = glutGet(GLUT_ELAPSED_TIME); //oldTime ê°’ì€ ì´ˆê¸°í™”ê³¼ì • ë§¨ ë§ˆì§€ë§‰ì— ì ìš©
 	wglMakeCurrent(m_hdc, NULL);
 }
 
-// ÃÊ±â ¼³Á¤ ÀÛ¾÷
+// ì´ˆê¸° ì„¤ì • ì‘ì—…
 bool OPenGLRenderer::initAi()
 {
 	wglMakeCurrent(m_hdc, m_hrc);
@@ -140,54 +140,54 @@ bool OPenGLRenderer::initAi()
 	return true;
 }
 
-// ±×¸®±â ¸Ş¼Òµå
+// ê·¸ë¦¬ê¸° ë©”ì†Œë“œ
 int OPenGLRenderer::DrawGLScene()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //¹è°æ Å¬¸®¾î
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // ¹öÆÛ ºñÆ® Å¬¸®¾î (°íÁ¤)
-	glLoadIdentity(); // (°íÁ¤)
-	glTranslatef(0.0f, 0.0f, zoom); //¿øÁ¡ÀÇ ÀÌµ¿
-	glRotatef(zAngle, 0.0f, 1.0f, 0.0f); // zÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà È¸Àü(È­¸é È¸Àü¿ë)
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //ë°°ê²½ í´ë¦¬ì–´
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // ë²„í¼ ë¹„íŠ¸ í´ë¦¬ì–´ (ê³ ì •)
+	glLoadIdentity(); // (ê³ ì •)
+	glTranslatef(0.0f, 0.0f, zoom); //ì›ì ì˜ ì´ë™
+	glRotatef(zAngle, 0.0f, 1.0f, 0.0f); // zì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• íšŒì „(í™”ë©´ íšŒì „ìš©)
 
 	////draw Earth
-	glPushMatrix(); // Áö±¸Áß½ÉÁÂÇ¥ Ãß°¡
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà -90µµ È¸Àü( ÀÚÀüÃà ¸ÂÃß±â¿ë )
+	glPushMatrix(); // ì§€êµ¬ì¤‘ì‹¬ì¢Œí‘œ ì¶”ê°€
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• -90ë„ íšŒì „( ìì „ì¶• ë§ì¶”ê¸°ìš© )
 	
-	glRotatef(zrot, 0.0f, 0.0f, 1.0f); //È¸Àü º¯È¯ (zÃà) (Áö±¸ ÀÚÀü)
-	gluQuadricDrawStyle(earth, GLU_FILL); // °´Ã¼¸¦ Ã¤¿ì´Â ÇüÅÂ·Î ¼³Á¤
-	glColor3f(1.0f, 1.0f, 1.0f); // »ö ÁöÁ¤
-	gluSphere(earth, radius_Earth, 24, 24); // ±¸¸¦ ±×¸²
+	glRotatef(zrot, 0.0f, 0.0f, 1.0f); //íšŒì „ ë³€í™˜ (zì¶•) (ì§€êµ¬ ìì „)
+	gluQuadricDrawStyle(earth, GLU_FILL); // ê°ì²´ë¥¼ ì±„ìš°ëŠ” í˜•íƒœë¡œ ì„¤ì •
+	glColor3f(1.0f, 1.0f, 1.0f); // ìƒ‰ ì§€ì •
+	gluSphere(earth, radius_Earth, 24, 24); // êµ¬ë¥¼ ê·¸ë¦¼
 
-	gluQuadricDrawStyle(earth, GLU_LINE); // ¼±À» ±ß´Â ÇüÅÂ·Î ¼³Á¤
-	glColor3f(0.2f, 0.2f, 1.0f); // »ö ÁöÁ¤
-	gluSphere(earth, radius_Earth + (GLfloat)0.05f, 24, 24); // ±¸¸¦ ±×¸²
+	gluQuadricDrawStyle(earth, GLU_LINE); // ì„ ì„ ê¸‹ëŠ” í˜•íƒœë¡œ ì„¤ì •
+	glColor3f(0.2f, 0.2f, 1.0f); // ìƒ‰ ì§€ì •
+	gluSphere(earth, radius_Earth + (GLfloat)0.05f, 24, 24); // êµ¬ë¥¼ ê·¸ë¦¼
 
-	// Blue coordinate (zÃà ÁÂÇ¥)
+	// Blue coordinate (zì¶• ì¢Œí‘œ)
 	glColor3f(0, 0, 1);
 	glBegin(GL_LINE_LOOP);
 	glVertex3f(0.0, 0.0, 40.0);
 	glVertex3f(0.0, 0.0, -40.0);
 	glEnd();
-	glPopMatrix(); // Áö±¸ Áß½ÉÁÂÇ¥ Á¦°Å
+	glPopMatrix(); // ì§€êµ¬ ì¤‘ì‹¬ì¢Œí‘œ ì œê±°
 
-	glPushMatrix(); ////// ´Ş ±×¸®±â À§ÇÑ ÁÂÇ¥ Ãß°¡  /////////
-	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // zÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà 20µµ È¸Àü( ±Ëµµ¸é È¸Àü )
-	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //È¸Àü º¯È¯ (zÃà) (´Ş °øÀü) , ±×¸®°í È¸ÀüÀ» Àû¿ë
-	glTranslatef(7.0f, 0.0f, 0.0f); // Áö±¸¿ÍÀÇ °Å¸®¸¸Å­ xÃà¿¡¼­ ÀÌµ¿
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà -90µµ È¸Àü( È¸ÀüÃà ¸ÂÃß±â¿ë )
+	glPushMatrix(); ////// ë‹¬ ê·¸ë¦¬ê¸° ìœ„í•œ ì¢Œí‘œ ì¶”ê°€  /////////
+	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // zì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• 20ë„ íšŒì „( ê¶¤ë„ë©´ íšŒì „ )
+	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //íšŒì „ ë³€í™˜ (zì¶•) (ë‹¬ ê³µì „) , ê·¸ë¦¬ê³  íšŒì „ì„ ì ìš©
+	glTranslatef(7.0f, 0.0f, 0.0f); // ì§€êµ¬ì™€ì˜ ê±°ë¦¬ë§Œí¼ xì¶•ì—ì„œ ì´ë™
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• -90ë„ íšŒì „( íšŒì „ì¶• ë§ì¶”ê¸°ìš© )
 
-	gluQuadricDrawStyle(moon, GLU_FILL); // °´Ã¼¸¦ Ã¤¿ì´Â ÇüÅÂ·Î ¼³Á¤
+	gluQuadricDrawStyle(moon, GLU_FILL); // ê°ì²´ë¥¼ ì±„ìš°ëŠ” í˜•íƒœë¡œ ì„¤ì •
 	glColor3f(0.35f, 0.35f, 0.35f);
 	gluSphere(moon, 0.3f, 12, 12);
-	gluQuadricDrawStyle(moon, GLU_LINE); // ¼±À» ±ß´Â ÇüÅÂ·Î ¼³Á¤
+	gluQuadricDrawStyle(moon, GLU_LINE); // ì„ ì„ ê¸‹ëŠ” í˜•íƒœë¡œ ì„¤ì •
 	glColor3f(0.7f, 0.7f, 0.7f);
 	gluSphere(moon, 0.32f, 12, 12);
-	glPopMatrix(); // ´Ş ÁÂÇ¥ Á¦°Å
+	glPopMatrix(); // ë‹¬ ì¢Œí‘œ ì œê±°
 
-	glPushMatrix();// ´Ş ±Ëµµ¸¦ ±×¸®±â À§ÇÑ ÁÂÇ¥ Ãß°¡
+	glPushMatrix();// ë‹¬ ê¶¤ë„ë¥¼ ê·¸ë¦¬ê¸° ìœ„í•œ ì¢Œí‘œ ì¶”ê°€
 	glColor3f(1.0f, 1.0f, 1.0f);
-	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // zÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà 20µµ È¸Àü( ±Ëµµ¸é È¸Àü )
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà -90µµ È¸Àü( ÁÂÇ¥Ãà ¸ÂÃß±â¿ë )
+	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // zì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• 20ë„ íšŒì „( ê¶¤ë„ë©´ íšŒì „ )
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• -90ë„ íšŒì „( ì¢Œí‘œì¶• ë§ì¶”ê¸°ìš© )
 	glBegin(GL_POINTS);
 	for (GLfloat angle = 0; angle < 360; angle += 0.1f)
 	{
@@ -196,39 +196,39 @@ int OPenGLRenderer::DrawGLScene()
 		glVertex3f(moon_xpos, moon_ypos, moon_zpos);
 	}
 	glEnd();
-	glPopMatrix(); /////// ´Ş ±Ëµµ ÁÂÇ¥ Á¦°Å ///////
+	glPopMatrix(); /////// ë‹¬ ê¶¤ë„ ì¢Œí‘œ ì œê±° ///////
 
 
 	for (int n = 0; n <= numOfCraft; n++) {
 		if (spaceCraft[n].craft != NULL) {
-			glPushMatrix(); // Ãß°¡µÈ ¿ìÁÖ¹°Ã¼ ±Ëµµ¸¦ ±×¸®±â À§ÇÑ ÁÂÇ¥ Ãß°¡
+			glPushMatrix(); // ì¶”ê°€ëœ ìš°ì£¼ë¬¼ì²´ ê¶¤ë„ë¥¼ ê·¸ë¦¬ê¸° ìœ„í•œ ì¢Œí‘œ ì¶”ê°€
 			glColor3f(1.0f, 1.0f, 1.0f);
-			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà -90µµ È¸Àü( ÁÂÇ¥Ãà ¸ÂÃß±â¿ë )
-			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // ÀÌÈÄ zÃàÀ» ±âÁØÀ¸·Î omega¸¸Å­ È¸Àü (½Â±³Á¡Àû°æ Àû¿ë)
-			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // È¸ÀüµÈ ÁÂÇ¥Ãà¿¡¼­ xÃàÀ» ±âÁØÀ¸·Î i¸¸Å­ È¸Àü (±Ëµµ°æ»ç°¢ Àû¿ë)
-			DrawTrajectory(n); // n¹øÂ° ¿ìÁÖ¹°Ã¼ÀÇ ±ËÀûÀ» ±×¸²
-			glPopMatrix();// Ãß°¡µÈ ¿ìÁÖ¹°Ã¼ ±Ëµµ¸¦ ±×¸®±â À§ÇÑ ÁÂÇ¥ »èÁ¦
+			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• -90ë„ íšŒì „( ì¢Œí‘œì¶• ë§ì¶”ê¸°ìš© )
+			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // ì´í›„ zì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ omegaë§Œí¼ íšŒì „ (ìŠ¹êµì ì ê²½ ì ìš©)
+			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // íšŒì „ëœ ì¢Œí‘œì¶•ì—ì„œ xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ië§Œí¼ íšŒì „ (ê¶¤ë„ê²½ì‚¬ê° ì ìš©)
+			DrawTrajectory(n); // në²ˆì§¸ ìš°ì£¼ë¬¼ì²´ì˜ ê¶¤ì ì„ ê·¸ë¦¼
+			glPopMatrix();// ì¶”ê°€ëœ ìš°ì£¼ë¬¼ì²´ ê¶¤ë„ë¥¼ ê·¸ë¦¬ê¸° ìœ„í•œ ì¢Œí‘œ ì‚­ì œ
 			
-			glPushMatrix(); // ¿ìÁÖ¹°Ã¼¸¦ ±×¸®±âÀ§ÇÑ ÁÂÇ¥ Ãß°¡
-			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà -90µµ È¸Àü( ÁÂÇ¥Ãà ¸ÂÃß±â¿ë )
-			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // ÀÌÈÄ zÃàÀ» ±âÁØÀ¸·Î omega¸¸Å­ È¸Àü (½Â±³Á¡Àû°æ Àû¿ë)
-			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // È¸ÀüµÈ ÁÂÇ¥Ãà¿¡¼­ xÃàÀ» ±âÁØÀ¸·Î i¸¸Å­ È¸Àü (±Ëµµ°æ»ç°¢ Àû¿ë)
-			DrawSphere(n); // n¹øÂ° ¿ìÁÖ¹°Ã¼¸¦ ±×¸²
-			glPopMatrix();// Ãß°¡µÈ ¿ìÁÖ¹°Ã¼¸¦ ±×¸®±â À§ÇÑ ÁÂÇ¥ »èÁ¦
+			glPushMatrix(); // ìš°ì£¼ë¬¼ì²´ë¥¼ ê·¸ë¦¬ê¸°ìœ„í•œ ì¢Œí‘œ ì¶”ê°€
+			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• -90ë„ íšŒì „( ì¢Œí‘œì¶• ë§ì¶”ê¸°ìš© )
+			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // ì´í›„ zì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ omegaë§Œí¼ íšŒì „ (ìŠ¹êµì ì ê²½ ì ìš©)
+			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // íšŒì „ëœ ì¢Œí‘œì¶•ì—ì„œ xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ië§Œí¼ íšŒì „ (ê¶¤ë„ê²½ì‚¬ê° ì ìš©)
+			DrawSphere(n); // në²ˆì§¸ ìš°ì£¼ë¬¼ì²´ë¥¼ ê·¸ë¦¼
+			glPopMatrix();// ì¶”ê°€ëœ ìš°ì£¼ë¬¼ì²´ë¥¼ ê·¸ë¦¬ê¸° ìœ„í•œ ì¢Œí‘œ ì‚­ì œ
 
-			glPushMatrix(); // ¿¹Ãø À§Ä¡ÀÇ ¹°Ã¼¸¦ ±×¸®±â À§ÇÑ ÁÂÇ¥ Ãß°¡
-			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xÃàÀ» ±âÁØÀ¸·Î ÁÂÇ¥Ãà -90µµ È¸Àü( ÁÂÇ¥Ãà ¸ÂÃß±â¿ë )
-			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // ÀÌÈÄ zÃàÀ» ±âÁØÀ¸·Î omega¸¸Å­ È¸Àü (½Â±³Á¡Àû°æ Àû¿ë)
-			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // È¸ÀüµÈ ÁÂÇ¥Ãà¿¡¼­ xÃàÀ» ±âÁØÀ¸·Î i¸¸Å­ È¸Àü (±Ëµµ°æ»ç°¢ Àû¿ë)
+			glPushMatrix(); // ì˜ˆì¸¡ ìœ„ì¹˜ì˜ ë¬¼ì²´ë¥¼ ê·¸ë¦¬ê¸° ìœ„í•œ ì¢Œí‘œ ì¶”ê°€
+			glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ì¢Œí‘œì¶• -90ë„ íšŒì „( ì¢Œí‘œì¶• ë§ì¶”ê¸°ìš© )
+			glRotatef(spaceCraft[n].omega, 0.0f, 0.0f, 1.0f); // ì´í›„ zì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ omegaë§Œí¼ íšŒì „ (ìŠ¹êµì ì ê²½ ì ìš©)
+			glRotatef(spaceCraft[n].i, 1.0f, 0.0f, 0.0f); // íšŒì „ëœ ì¢Œí‘œì¶•ì—ì„œ xì¶•ì„ ê¸°ì¤€ìœ¼ë¡œ ië§Œí¼ íšŒì „ (ê¶¤ë„ê²½ì‚¬ê° ì ìš©)
 			glRotatef(spaceCraft[n].w, 0.0f, 0.0f, 1.0f);
-			DrawPrediction(n); // ¿¹Ãø ¸ğµå ÁßÀÌ¸é ¿¹Ãø ±ØÁÂÇ¥¿¡ ±¸¸¦ ±×·ÁÁÜ
-			glPopMatrix(); // ¿¹Ãø À§Ä¡ÀÇ ¹°Ã¼¸¦ ±×¸®±â À§ÇÑ ÁÂÇ¥ Á¦°Å
+			DrawPrediction(n); // ì˜ˆì¸¡ ëª¨ë“œ ì¤‘ì´ë©´ ì˜ˆì¸¡ ê·¹ì¢Œí‘œì— êµ¬ë¥¼ ê·¸ë ¤ì¤Œ
+			glPopMatrix(); // ì˜ˆì¸¡ ìœ„ì¹˜ì˜ ë¬¼ì²´ë¥¼ ê·¸ë¦¬ê¸° ìœ„í•œ ì¢Œí‘œ ì œê±°
 		}
 	}
 	
 	glFlush();
 	
-	// Áö±¸ ÀÚÀü ¼Óµµ
+	// ì§€êµ¬ ìì „ ì†ë„
 	zrot += 360.0f / 87840.0f / timeScale;
 	if (zrot > 360.0f) {
 		zrot -= 360.0f;
@@ -245,7 +245,7 @@ int OPenGLRenderer::DrawGLScene()
 	return TRUE;
 }
 
-// ¾À »èÁ¦
+// ì”¬ ì‚­ì œ
 void OPenGLRenderer::DestroyScene()
 {
 	DestroyWindow();
@@ -280,21 +280,21 @@ int OPenGLRenderer::LoadGLTextures()
 {
 	int Status = FALSE;
 
-	gluQuadricTexture(earth, GL_TRUE); // ÅØ½ºÃ³ ¸ÅÇÎ »ç¿ë
-	memset(pTextureImage, 0, sizeof(void*) * 1); // Æ÷ÀÎÅÍ ÃÊ±âÈ­
+	gluQuadricTexture(earth, GL_TRUE); // í…ìŠ¤ì²˜ ë§¤í•‘ ì‚¬ìš©
+	memset(pTextureImage, 0, sizeof(void*) * 1); // í¬ì¸í„° ì´ˆê¸°í™”
 
 	if (pTextureImage[0] = LoadBMPFile("earth.bmp")) {
 		Status = TRUE;
-		glGenTextures(1, &textureID[0]); // ÅØ½ºÃÄ °´Ã¼ »ı¼º
-		glBindTexture(GL_TEXTURE_2D, textureID[0]); // »óÅÂ°ü¸®ÀÚ¿¡°Ô [0]¹øÂ° ÅØ½ºÃ³¸¦ ¹ÙÀÎµù
+		glGenTextures(1, &textureID[0]); // í…ìŠ¤ì³ ê°ì²´ ìƒì„±
+		glBindTexture(GL_TEXTURE_2D, textureID[0]); // ìƒíƒœê´€ë¦¬ìì—ê²Œ [0]ë²ˆì§¸ í…ìŠ¤ì²˜ë¥¼ ë°”ì¸ë”©
 		glTexImage2D(GL_TEXTURE_2D, 0, 3, pTextureImage[0]->sizeX, pTextureImage[0]->sizeY, 0,
 			GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[0]->data);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // ÀÌ¹ÌÁö ÆÄÀÏ°ú ¹°Ã¼ÀÇ Å©±â¸¦ ¸ÂÃçÁØ´Ù
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // ì´ë¯¸ì§€ íŒŒì¼ê³¼ ë¬¼ì²´ì˜ í¬ê¸°ë¥¼ ë§ì¶°ì¤€ë‹¤
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glEnable(GL_TEXTURE_2D);
 	}
 
-	//ÅØ½ºÃ³ °ø°£¹İ³³
+	//í…ìŠ¤ì²˜ ê³µê°„ë°˜ë‚©
 	if (pTextureImage[0]) {
 		if (pTextureImage[0]->data) {
 			free(pTextureImage[0]->data);
@@ -304,13 +304,13 @@ int OPenGLRenderer::LoadGLTextures()
 	return Status;
 }
 
-// ¿ìÁÖ¹°Ã¼¸¦ Á÷Á¢ÀûÀ¸·Î »ı¼ºÇÏ´Â ÇÔ¼ö
+// ìš°ì£¼ë¬¼ì²´ë¥¼ ì§ì ‘ì ìœ¼ë¡œ ìƒì„±í•˜ëŠ” í•¨ìˆ˜
 void OPenGLRenderer::CreateCraft(int num) 
 {
-	spaceCraft[num].craft = gluNewQuadric(); // ¹°Ã¼ °´Ã¼ ÀÎ½ºÅÏ½º »ı¼º
+	spaceCraft[num].craft = gluNewQuadric(); // ë¬¼ì²´ ê°ì²´ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
 }
 
-// ¿ìÁÖ¹°Ã¼ ±ËÀûÀ» ±×·ÁÁÖ´Â ÇÔ¼ö
+// ìš°ì£¼ë¬¼ì²´ ê¶¤ì ì„ ê·¸ë ¤ì£¼ëŠ” í•¨ìˆ˜
 void OPenGLRenderer::DrawTrajectory(int num) 
 {
 	glRotatef(spaceCraft[num].w, 0.0f, 0.0f, 1.0f);
@@ -340,21 +340,21 @@ void OPenGLRenderer::DrawTrajectory(int num)
 	}
 }
 
-// ¿ìÁÖ¹°Ã¼ ±¸¸¦ ±×·ÁÁÖ´Â ÇÔ¼ö
+// ìš°ì£¼ë¬¼ì²´ êµ¬ë¥¼ ê·¸ë ¤ì£¼ëŠ” í•¨ìˆ˜
 void OPenGLRenderer::DrawSphere(int num) 
 {
-	glRotatef(spaceCraft[num].w, 0.0f, 0.0f, 1.0f); // w ¸¸Å­ ±×¸®´Â ±âÁØ¸é È¸Àü
-	// ¿©±â¼­ f¸¸Å­ È¸ÀüÇÑ À§Ä¡¿¡¼­ ÃÊ±â ±¸Ã¼ »ı¼º
+	glRotatef(spaceCraft[num].w, 0.0f, 0.0f, 1.0f); // w ë§Œí¼ ê·¸ë¦¬ëŠ” ê¸°ì¤€ë©´ íšŒì „
+	// ì—¬ê¸°ì„œ fë§Œí¼ íšŒì „í•œ ìœ„ì¹˜ì—ì„œ ì´ˆê¸° êµ¬ì²´ ìƒì„±
 	spaceCraft[num].xpos = (GLfloat)cos(spaceCraft[num].angle * GL_PI / 180.0f) * spaceCraft[num].radius / 1000.0f;
 	spaceCraft[num].ypos = (GLfloat)sin(spaceCraft[num].angle * GL_PI / 180.0f) * spaceCraft[num].radius / 1000.0f;
 
 	// drawing
-	glTranslatef(spaceCraft[num].xpos, spaceCraft[num].ypos, 0.0f); // ±¸Ã¼ ÀÌµ¿ (¹æÁ¤½Ä¿¡ µû¶ó ÀÌ Æ÷Áö¼ÇÀÌ ¹Ù²ï´Ù)
-	gluQuadricDrawStyle(spaceCraft[num].craft, GLU_FILL); // °´Ã¼¸¦ Ã¤¿ì´Â ÇüÅÂ·Î ¼³Á¤
+	glTranslatef(spaceCraft[num].xpos, spaceCraft[num].ypos, 0.0f); // êµ¬ì²´ ì´ë™ (ë°©ì •ì‹ì— ë”°ë¼ ì´ í¬ì§€ì…˜ì´ ë°”ë€ë‹¤)
+	gluQuadricDrawStyle(spaceCraft[num].craft, GLU_FILL); // ê°ì²´ë¥¼ ì±„ìš°ëŠ” í˜•íƒœë¡œ ì„¤ì •
 	glColor3f(0.35f, 0.35f, 0.35f);
 	gluSphere(spaceCraft[num].craft, 0.3f, 12, 12);
 
-	gluQuadricDrawStyle(spaceCraft[num].craft, GLU_LINE); // ¼±À» ±ß´Â ÇüÅÂ·Î ¼³Á¤
+	gluQuadricDrawStyle(spaceCraft[num].craft, GLU_LINE); // ì„ ì„ ê¸‹ëŠ” í˜•íƒœë¡œ ì„¤ì •
 	if(spaceCraft[num].isSelected == 0)
 		glColor3f(0.4f, 0.4f, 0.8f);
 	else
@@ -362,21 +362,21 @@ void OPenGLRenderer::DrawSphere(int num)
 	gluSphere(spaceCraft[num].craft, 0.32f, 12, 12);
 
 	/// Update values ///
-	spaceCraft[num].angleSpeed = spaceCraft[num].h / (GLfloat)pow((double)spaceCraft[num].radius, 2); // °¢¼Óµµ ±¸ÇÏ±â
-	spaceCraft[num].angle += (spaceCraft[num].angleSpeed * 180.0f) / GL_PI / timeScale; // °¢¼Óµµ Àû¿ë
+	spaceCraft[num].angleSpeed = spaceCraft[num].h / (GLfloat)pow((double)spaceCraft[num].radius, 2); // ê°ì†ë„ êµ¬í•˜ê¸°
+	spaceCraft[num].angle += (spaceCraft[num].angleSpeed * 180.0f) / GL_PI / timeScale; // ê°ì†ë„ ì ìš©
 	
 	spaceCraft[num].radius = (GLfloat)(spaceCraft[num].p / (1 + spaceCraft[num].e * cos(spaceCraft[num].angle * GL_PI / 180.0f)));
 	if (spaceCraft[num].angle > 360.0f) {
 		spaceCraft[num].angle -= 360.0f;
 	}
 
-	CalculateT(num); // ±ÙÁöÁ¡ Åë°ú½Ã ¾÷µ¥ÀÌÆ®
+	CalculateT(num); // ê·¼ì§€ì  í†µê³¼ì‹œ ì—…ë°ì´íŠ¸
 	//// Update End ////
 
-	PredictionPosition(num, spaceCraft[num].preTime); //
+	PredictionPosition(num, spaceCraft[num].preTime); // ì˜ˆì¸¡ ë¬¼ì²´ìœ„ì¹˜ ê³„ì† ì—…ë°ì´íŠ¸
 }
 
-// ±ÙÁöÁ¡ Åë°ú ½Ã°¢À» ±¸ÇÏ´Â ÇÔ¼ö
+// ê·¼ì§€ì  í†µê³¼ ì‹œê°ì„ êµ¬í•˜ëŠ” í•¨ìˆ˜
 void OPenGLRenderer::CalculateT(int num) 
 { 
 	GLfloat cosE;
@@ -396,7 +396,7 @@ void OPenGLRenderer::CalculateT(int num)
 		spaceCraft[num].T = -spaceCraft[num].T;
 }
 
-// ¿¹Ãø ±ØÁÂÇ¥¸¦ ±¸ÇÏ´Â ÇÔ¼ö
+// ì˜ˆì¸¡ ê·¹ì¢Œí‘œë¥¼ êµ¬í•˜ëŠ” í•¨ìˆ˜
 void OPenGLRenderer::PredictionPosition(int num, GLfloat time) 
 {
 	const int repeat = 4;
@@ -410,7 +410,7 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 	else
 		spaceCraft[num].M = spaceCraft[num].n * (time + spaceCraft[num].P - spaceCraft[num].T);
 
-	E[0] = spaceCraft[num].M; // E0 = M0 ±Ù»ç
+	E[0] = spaceCraft[num].M; // E0 = M0 ê·¼ì‚¬
 	for (int i = 0; i < repeat; i++) {
 		M[i] = E[i] - (spaceCraft[num].e * sinf(E[i]));
 		deltaE = (spaceCraft[num].M - M[i]) / (1 - spaceCraft[num].e * cosf(E[0]));
@@ -432,10 +432,10 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 
 void OPenGLRenderer::CreatPreCraft(int num)
 {
-	preCraft[num] = gluNewQuadric(); // ¹°Ã¼ °´Ã¼ ÀÎ½ºÅÏ½º »ı¼º
+	preCraft[num] = gluNewQuadric(); // ë¬¼ì²´ ê°ì²´ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
 }
 
-// ¿¹Ãø ±ØÁÂÇ¥¿¡ ±×·ÁÁÖ´Â ÇÔ¼ö
+// ì˜ˆì¸¡ ê·¹ì¢Œí‘œì— ê·¸ë ¤ì£¼ëŠ” í•¨ìˆ˜
 void OPenGLRenderer::DrawPrediction(int num)
 {
 	GLfloat preX;
@@ -447,12 +447,12 @@ void OPenGLRenderer::DrawPrediction(int num)
 			preY = (GLfloat)sin(spaceCraft[num].preF * GL_PI / 180.0f) * spaceCraft[num].preRadius / 1000.0f;
 
 			// drawing
-			glTranslatef(preX, preY, 0.0f); // ±¸Ã¼ ÀÌµ¿ (¹æÁ¤½Ä¿¡ µû¶ó ÀÌ Æ÷Áö¼ÇÀÌ ¹Ù²ï´Ù)
-			gluQuadricDrawStyle(preCraft[num], GLU_FILL); // °´Ã¼¸¦ Ã¤¿ì´Â ÇüÅÂ·Î ¼³Á¤
+			glTranslatef(preX, preY, 0.0f); // êµ¬ì²´ ì´ë™ (ë°©ì •ì‹ì— ë”°ë¼ ì´ í¬ì§€ì…˜ì´ ë°”ë€ë‹¤)
+			gluQuadricDrawStyle(preCraft[num], GLU_FILL); // ê°ì²´ë¥¼ ì±„ìš°ëŠ” í˜•íƒœë¡œ ì„¤ì •
 			glColor3f(0.0f, 0.0f, 0.0f);
 			gluSphere(preCraft[num], 0.3f, 12, 12);
 
-			gluQuadricDrawStyle(preCraft[num], GLU_LINE); // ¼±À» ±ß´Â ÇüÅÂ·Î ¼³Á¤
+			gluQuadricDrawStyle(preCraft[num], GLU_LINE); // ì„ ì„ ê¸‹ëŠ” í˜•íƒœë¡œ ì„¤ì •
 			glColor3f(0.7f, 0.7f, 0.7f);
 			gluSphere(preCraft[num], 0.32f, 12, 12);
 		}
@@ -481,12 +481,12 @@ void OPenGLRenderer::unProject(CPoint point) {
 
 
 ///// user input functions /////
-void OPenGLRenderer::OnLButtonDown(UINT nFlags, CPoint point) // Å¬¸¯ÇÏ¸é Å¬¸¯ ½ÃÀÇ ¸¶¿ì½º À§Ä¡°¡ ÀúÀåµÈ´Ù.
+void OPenGLRenderer::OnLButtonDown(UINT nFlags, CPoint point) // í´ë¦­í•˜ë©´ í´ë¦­ ì‹œì˜ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ê°€ ì €ì¥ëœë‹¤.
 {
 	GLfloat x;
 
-	// TODO: ¿©±â¿¡ ¸Ş½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº»°ªÀ» È£ÃâÇÕ´Ï´Ù.
-	b_Rotate = TRUE; // È¸Àü¸ğµå ½ÃÀÛ
+	// TODO: ì—¬ê¸°ì— ë©”ì‹œì§€ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€ ë°/ë˜ëŠ” ê¸°ë³¸ê°’ì„ í˜¸ì¶œí•©ë‹ˆë‹¤.
+	b_Rotate = TRUE; // íšŒì „ëª¨ë“œ ì‹œì‘
 	x = (GLfloat)point.x;
 	mousePoint = x;
 
@@ -498,7 +498,7 @@ void OPenGLRenderer::OnLButtonDown(UINT nFlags, CPoint point) // Å¬¸¯ÇÏ¸é Å¬¸¯ ½
 
 void OPenGLRenderer::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// TODO: ¿©±â¿¡ ¸Ş½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº»°ªÀ» È£ÃâÇÕ´Ï´Ù.
+	// TODO: ì—¬ê¸°ì— ë©”ì‹œì§€ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€ ë°/ë˜ëŠ” ê¸°ë³¸ê°’ì„ í˜¸ì¶œí•©ë‹ˆë‹¤.
 	GLfloat x;
 	
 	x = (GLfloat)point.x;
@@ -506,7 +506,7 @@ void OPenGLRenderer::OnMouseMove(UINT nFlags, CPoint point)
 		differ = x - mousePoint;
 	}
 	mousePoint = x;
-	differ *= 40.0f; // È¸Àü ¹Î°¨µµ
+	differ *= 40.0f; // íšŒì „ ë¯¼ê°ë„
 	zAngle += differ/100.0f;
 
 	if (zAngle > 359.0f || zAngle < -359.0f) zAngle = 0.0f;
@@ -517,16 +517,16 @@ void OPenGLRenderer::OnMouseMove(UINT nFlags, CPoint point)
 
 void OPenGLRenderer::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	// TODO: ¿©±â¿¡ ¸Ş½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº»°ªÀ» È£ÃâÇÕ´Ï´Ù.
+	// TODO: ì—¬ê¸°ì— ë©”ì‹œì§€ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€ ë°/ë˜ëŠ” ê¸°ë³¸ê°’ì„ í˜¸ì¶œí•©ë‹ˆë‹¤.
 	b_Rotate = FALSE;
 	differ = 0.0f;
 	CWnd::OnLButtonUp(nFlags, point);
 }
 
 
-BOOL OPenGLRenderer::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) // È­¸é ÁÜ¾Æ¿ô
+BOOL OPenGLRenderer::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) // í™”ë©´ ì¤Œì•„ì›ƒ
 {
-	// TODO: ¿©±â¿¡ ¸Ş½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº»°ªÀ» È£ÃâÇÕ´Ï´Ù.
+	// TODO: ì—¬ê¸°ì— ë©”ì‹œì§€ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€ ë°/ë˜ëŠ” ê¸°ë³¸ê°’ì„ í˜¸ì¶œí•©ë‹ˆë‹¤.
 	GLfloat temp_zoom;
 	temp_zoom = ((GLfloat)zDelta) / 100.0f;
 
