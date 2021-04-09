@@ -1,4 +1,4 @@
-
+﻿
 // trajectoryMFCDlg.cpp: 구현 파일
 //
 
@@ -213,8 +213,8 @@ void CtrajectoryMFCDlg::printInfo(int n)
 {
 	CString str;
 
-	//str.Format(_T("%f"), m_test->spaceCraft[n].tsetnum); // float -> CString
-	//SetDlgItemText(IDC_EDIT0, str);
+	str.Format(_T("%f"), m_test->spaceCraft[n].P); // float -> CString
+	SetDlgItemText(IDC_EDIT0, str);
 
 	str.Format(_T("%f"), m_test->spaceCraft[n].omega); // float -> CString
 	SetDlgItemText(IDC_EDIT1, str);
@@ -263,11 +263,6 @@ void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
 		CalculateOmegaAndI(m_test->numOfCraft); // 경사각 i와 승교점 적경 omege 구하기
 
 		CalculateAAndE(m_test->numOfCraft); // 장반경 a와 이심률 e 구하기
-
-		if (m_test->spaceCraft[m_test->numOfCraft].type == 2) { // 쌍곡선 궤도는 생성 불가
-			MessageBox(_T("The space craft will escape the earth."), _T("Caution"), MB_ICONWARNING);
-			return;
-		}
 
 		CalculatePeriod(m_test->numOfCraft); // 주기 구하기
 
@@ -333,7 +328,13 @@ void CtrajectoryMFCDlg::CalculateAAndE(int n) { // a e p 구함
 
 	m_test->spaceCraft[n].a = (GLfloat)(1.0 / reciprocal_a) / 1000.0f; // (m->km)
 	squarh = pow((double)m_test->spaceCraft[n].h, 2); // h^2
-	square = 1 - (squarh / (GM * pow(10, -9) * m_test->spaceCraft[n].a)); // GM을 pow(10,-9)를 통해 km로 맞춰줌
+
+	if (m_test->spaceCraft[n].type == 1) { // 타원궤도
+		square = 1 - (squarh / (GM * pow(10, -9) * m_test->spaceCraft[n].a)); // e^2 // GM을 pow(10,-9)를 통해 km로 맞춰줌
+	}
+	else { // 쌍곡선궤도
+		square = 1 + (squarh / (GM * pow(10, -9) * m_test->spaceCraft[n].a)); // e^2 // GM을 pow(10,-9)를 통해 km로 맞춰줌
+	}
 	m_test->spaceCraft[n].e = (GLfloat)sqrt(square);
 
 	if (m_test->spaceCraft[n].type == 1) { // 타원궤도
@@ -367,7 +368,7 @@ void CtrajectoryMFCDlg::CalculatePeriod(int n) {
 	m_test->spaceCraft[n].n = 2.0f * m_test->GL_PI / m_test->spaceCraft[n].P; // mean motion 구함
 }
 
-void CtrajectoryMFCDlg::CalculateWAndF(int n) { /// w에 문제가 있다.
+void CtrajectoryMFCDlg::CalculateWAndF(int n) { 
 	// f 구하기 (f의 사분면을 아직 고려해야함)
 	int sign = 0;
 
@@ -488,11 +489,9 @@ void CtrajectoryMFCDlg::OnBnClickedButtonPrediction()
 			GetDlgItemText(IDC_EDIT8, time);
 			float_time = (GLfloat)atof((CStringA)time);
 			m_test->PredictionPosition(i, float_time); // time을 넘겨줘서 예측 위치를 구한다.
+			m_test->spaceCraft[i].preTime = float_time; // 예측시간을 저장
 			m_test->spaceCraft[i].isStarted = 1; // 예측이 시작됨을 알림
 			m_test->CreatPreCraft(i);
-
-			str.Format(_T("%f"), m_test->spaceCraft[i].preRadius); // float -> CString
-			SetDlgItemText(IDC_EDIT0, str);
 		}
 	}
 }
