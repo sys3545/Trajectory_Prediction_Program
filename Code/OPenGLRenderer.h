@@ -12,16 +12,16 @@ typedef struct vecInfo_t {
 	GLfloat xpos = 0.0f, ypos = 0.0f, zpos = 0.0f;
 	GLfloat xvel = 0.0f, yvel = 0.0f, zvel = 0.0f;
 	GLfloat C1 = 0.0f, C2 = 0.0f, C3 = 0.0f, h = 0.0f;
-	GLfloat i = 0.0f, omega = 0.0f, a = 0.0f, e = 0.0f, w = 0.0f, T = 0.0f; // ê¶¤ë„ì˜ 6ìš”ì†Œ
-	GLfloat n = 0.0f, M = 0.0f, E = 0.0f, preRadius = 0.0f, preF = 0.0f; // n : mean motion, M : mean anomaly, E : eccentric anomaly
-	GLfloat u = 0.0f, f = 0.0f, p = 0.0f; // u = w + f , fëŠ” ì§„ê·¼ì§€ì ì´ê° True anomaly , pëŠ” ë°˜ì§í˜„
-	GLfloat range = 0.0f, velocity = 0.0f; // ì´ˆê¸° ê±°ë¦¬, ì´ˆê¸° ì†ë„
-	GLfloat traj_range = 0.0f, traj_xpos = 0.0f, traj_ypos = 0.0f;  // ê¶¤ë„ë¥¼ ê·¸ë¦¬ê¸° ìœ„í•œ ë³€í•˜ëŠ” ë³€ìˆ˜ë“¤
-	GLfloat angleSpeed = 0.0f, angle = 0.0f, P = 0.0f; // ê°ì†ë„, ë³€í•˜ëŠ” ê°  (ì´ˆê¸°ê°ì€ f) , ì£¼ê¸°
-	GLfloat radius = 0.0f; // ë³€í•˜ëŠ” ê±°ë¦¬ (ì´ˆê¸° ê±°ë¦¬ì—ì„œ ì‹œì‘)
-	GLint isSelected = 0; // ì„ íƒì´ ë˜ì—ˆëŠ”ê°€?
-	GLint isStarted = 0; // ì˜ˆì¸¡ ëª¨ë“œê°€ ì‹œì‘ ë˜ì—ˆëŠ”ê°€?
-	GLint type = 0; // ê¶¤ë„ í˜•íƒœ (1.íƒ€ì›, 2.ìŒê³¡ì„ )
+	GLfloat i = 0.0f, omega = 0.0f, a = 0.0f, e = 0.0f, w = 0.0f, T = 0.0f; // ±ËµµÀÇ 6¿ä¼Ò
+	GLfloat n = 0.0f, M = 0.0f, E = 0.0f, preRadius = 0.0f, preF = 0.0f, preTime = 0.0f; // n : mean motion, M : mean anomaly, E : eccentric anomaly
+	GLfloat u = 0.0f, f = 0.0f, p = 0.0f; // u = w + f , f´Â Áø±ÙÁöÁ¡ÀÌ°¢ True anomaly , p´Â ¹İÁ÷Çö
+	GLfloat range = 0.0f, velocity = 0.0f; // ÃÊ±â °Å¸®, ÃÊ±â ¼Óµµ
+	GLfloat traj_range = 0.0f, traj_xpos = 0.0f, traj_ypos = 0.0f;  // ±Ëµµ¸¦ ±×¸®±â À§ÇÑ º¯ÇÏ´Â º¯¼öµé
+	GLfloat angleSpeed = 0.0f, angle = 0.0f, P = 0.0f; // °¢¼Óµµ, º¯ÇÏ´Â °¢  (ÃÊ±â°¢Àº f) , ÁÖ±â
+	GLfloat radius = 0.0f; // º¯ÇÏ´Â °Å¸® (ÃÊ±â °Å¸®¿¡¼­ ½ÃÀÛ)
+	GLint isSelected = 0; // ¼±ÅÃÀÌ µÇ¾ú´Â°¡?
+	GLint isStarted = 0; // ¿¹Ãø ¸ğµå°¡ ½ÃÀÛ µÇ¾ú´Â°¡?
+	GLint type = 0; // ±Ëµµ ÇüÅÂ (1.Å¸¿ø, 2.½Ö°î¼±)
 	GLUquadricObj* craft = NULL;
 }vecInfo_t;
 
@@ -37,67 +37,67 @@ public:
 	int DrawGLScene();				//Here's where we do all the drawing
 	bool initAi();
 
-	// ê·¸ë¦¬ê¸°ìš© ì‚¬ìš©ì ì„¤ì • í•¨ìˆ˜
-	void CreateCraft(int num); // ìš°ì£¼ë¬¼ì²´ ê°ì²´ë¥¼ ìƒì„±í•˜ëŠ” í•¨ìˆ˜
-	void DrawTrajectory(int num); // ìš°ì£¼ë¬¼ì²´ ê¶¤ì ì„ ê·¸ë ¤ì£¼ëŠ” í•¨ìˆ˜
-	void DrawSphere(int num); // ìš°ì£¼ë¬¼ì²´ êµ¬ë¥¼ ê·¸ë ¤ì£¼ëŠ” í•¨ìˆ˜
+	// ±×¸®±â¿ë »ç¿ëÀÚ ¼³Á¤ ÇÔ¼ö
+	void CreateCraft(int num); // ¿ìÁÖ¹°Ã¼ °´Ã¼¸¦ »ı¼ºÇÏ´Â ÇÔ¼ö
+	void DrawTrajectory(int num); // ¿ìÁÖ¹°Ã¼ ±ËÀûÀ» ±×·ÁÁÖ´Â ÇÔ¼ö
+	void DrawSphere(int num); // ¿ìÁÖ¹°Ã¼ ±¸¸¦ ±×·ÁÁÖ´Â ÇÔ¼ö
 
-	// í…ìŠ¤ì²˜ ê´€ë ¨ í•¨ìˆ˜
-	AUX_RGBImageRec* LoadBMPFile(char* filename); // ë³€ìˆ˜ì— ì´ë¯¸ì§€ë¥¼ ë¶ˆëŸ¬ì˜¤ëŠ” í•¨ìˆ˜
-	int LoadGLTextures(); //í…ìŠ¤ì³ ì‘ì—…ì„ í•´ì£¼ëŠ” í•¨ìˆ˜
+	// ÅØ½ºÃ³ °ü·Ã ÇÔ¼ö
+	AUX_RGBImageRec* LoadBMPFile(char* filename); // º¯¼ö¿¡ ÀÌ¹ÌÁö¸¦ ºÒ·¯¿À´Â ÇÔ¼ö
+	int LoadGLTextures(); //ÅØ½ºÃÄ ÀÛ¾÷À» ÇØÁÖ´Â ÇÔ¼ö
 
 public:
-	// ì§€êµ¬ì˜ ì„±ë¶„
-	GLfloat		zrot = 0; // ì§€êµ¬ ìì „ ì†ë„
+	// Áö±¸ÀÇ ¼ººĞ
+	GLfloat		zrot = 0; // Áö±¸ ÀÚÀü ¼Óµµ
 	GLfloat     radius_Earth = 6.378f; ////////// 1.0f = 1000km //////////
 	GLfloat     mass_Earth = (GLfloat)5.972 * (GLfloat)pow(10, 24); // kg
-	double      G = 6.673 * pow(10, -11); // m^3/kg/s^2 (ì¤‘ë ¥ìƒìˆ˜)
+	double      G = 6.673 * pow(10, -11); // m^3/kg/s^2 (Áß·Â»ó¼ö)
 
-	// ë‹¬ íšŒì „ ì„±ë¶„
-	GLfloat		moon_zrot = 0; // ë‹¬ ê³µì „ ì†ë„
-	GLfloat		moon_xpos = 7.0f; // ì§€êµ¬ì™€ ë‹¬ê±°ë¦¬
+	// ´Ş È¸Àü ¼ººĞ
+	GLfloat		moon_zrot = 0; // ´Ş °øÀü ¼Óµµ
+	GLfloat		moon_xpos = 7.0f; // Áö±¸¿Í ´Ş°Å¸®
 	GLfloat		moon_ypos = 0;
 	GLfloat		moon_zpos = 0;
 
-	GLUquadricObj* earth = NULL; // ì§€êµ¬ ê°ì²´
-	GLUquadricObj* moon = NULL; // ë‹¬ ê°ì²´
-	vecInfo_t spaceCraft[6]; // ìš°ì£¼ë¬¼ì²´ ê°ì²´
-	int numOfCraft = 0; // ìš°ì£¼ë¬¼ì²´ ê°¯ìˆ˜
-	GLUquadricObj* preCraft[6]; // ì˜ˆì¸¡ê¶¤ë„ ê·¸ë¦´ì‹œì— ì‚¬ìš©í•  ê°ì²´
+	GLUquadricObj* earth = NULL; // Áö±¸ °´Ã¼
+	GLUquadricObj* moon = NULL; // ´Ş °´Ã¼
+	vecInfo_t spaceCraft[6]; // ¿ìÁÖ¹°Ã¼ °´Ã¼
+	int numOfCraft = 0; // ¿ìÁÖ¹°Ã¼ °¹¼ö
+	GLUquadricObj* preCraft[6]; // ¿¹Ãø±Ëµµ ±×¸±½Ã¿¡ »ç¿ëÇÒ °´Ã¼
 
-	/// ìˆ˜ì‹ì— í•„ìš”í•œ ë³€ìˆ˜ì„ ì–¸
+	/// ¼ö½Ä¿¡ ÇÊ¿äÇÑ º¯¼ö¼±¾ğ
 	GLfloat		GL_PI = (GLfloat)3.141592;
 	GLfloat     mass_Sun = 2.0f * (GLfloat)pow(10, 30); // kg
 
-	/// ì‹œê°„ê´€ë ¨ ë³€ìˆ˜
-	GLfloat timeScale = 63.38f; // 1ì´ˆëŠ” 63.38 tick ì´ë‹¤. ì›ë˜ ê°ì†ë„ì— ì´ ê°’ì„ ë‚˜ëˆ„ë©´ ëœë‹¤. 
+	/// ½Ã°£°ü·Ã º¯¼ö
+	GLfloat timeScale = 63.38f; // 1ÃÊ´Â 63.38 tick ÀÌ´Ù. ¿ø·¡ °¢¼Óµµ¿¡ ÀÌ °ªÀ» ³ª´©¸é µÈ´Ù. 
 	int currentTime = 0;
 	int oldTime = 0;
 	int deltaTime = 0;
-	int realTime = 1; // ì‹¤ì œì‹œê°„ê³¼ì˜ ë°°ì†ì´ ì–´ëŠì •ë„ ì¸ì§€ ë³´ì—¬ì£¼ëŠ” ë³€ìˆ˜
+	int realTime = 1; // ½ÇÁ¦½Ã°£°úÀÇ ¹è¼ÓÀÌ ¾î´ÀÁ¤µµ ÀÎÁö º¸¿©ÁÖ´Â º¯¼ö
 
-	CString test; // ê¹ƒ ë°ìŠ¤í¬íƒ‘ í…ŒìŠ¤íŠ¸ //
-	GLdouble wx = 0.0;
-	GLdouble wy = 0.0;
-	GLdouble wz = 0.0;
+	CString test; // ±ê µ¥½ºÅ©Å¾ Å×½ºÆ® //
+	GLdouble wx=0.0;
+	GLdouble wy=0.0;
+	GLdouble wz=0.0;
 
-	// í…ìŠ¤ì²˜ ê´€ë ¨ ë³€ìˆ˜
-	AUX_RGBImageRec* pTextureImage[1]; // ì´ë¯¸ì§€ íŒŒì¼ì— ëŒ€í•œ ì •ë³´ë¥¼ ê°€ì§€ê³  ìˆëŠ” ë°°ì—´
-	GLuint textureID[1]; // í…ìŠ¤ì²˜ì˜ í•¸ë“¤ì„ ì €ì¥í•˜ëŠ” ë°°ì—´
+	// ÅØ½ºÃ³ °ü·Ã º¯¼ö
+	AUX_RGBImageRec* pTextureImage[1]; // ÀÌ¹ÌÁö ÆÄÀÏ¿¡ ´ëÇÑ Á¤º¸¸¦ °¡Áö°í ÀÖ´Â ¹è¿­
+	GLuint textureID[1]; // ÅØ½ºÃ³ÀÇ ÇÚµéÀ» ÀúÀåÇÏ´Â ¹è¿­
 
-	// ë§ˆìš°ìŠ¤ ì…ë ¥ì‹œ íšŒì „ ë³€ìˆ˜
-	BOOL b_Rotate = FALSE; // ë§ˆìš°ìŠ¤ ìƒíƒœì— ë”°ë¥¸ íšŒì „ì„ ê°ì§€
-	GLfloat mousePoint; // ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¥¼ ì¡ëŠ” ë³€ìˆ˜
-	GLfloat differ; // ë§ˆìš°ìŠ¤ê°€ ì›€ì§ì¸ ì •ë„
-	GLfloat zAngle = 0.0f; // í™”ë©´ íšŒì „ ê°ë„
-	GLfloat zoom = 0.0f; // ì¤Œ ì •ë„
+	// ¸¶¿ì½º ÀÔ·Â½Ã È¸Àü º¯¼ö
+	BOOL b_Rotate = FALSE; // ¸¶¿ì½º »óÅÂ¿¡ µû¸¥ È¸ÀüÀ» °¨Áö
+	GLfloat mousePoint; // ¸¶¿ì½º À§Ä¡¸¦ Àâ´Â º¯¼ö
+	GLfloat differ; // ¸¶¿ì½º°¡ ¿òÁ÷ÀÎ Á¤µµ
+	GLfloat zAngle = 0.0f; // È­¸é È¸Àü °¢µµ
+	GLfloat zoom = 0.0f; // ÁÜ Á¤µµ
 
-	// ê¶¤ë„ ì˜ˆì¸¡ ê´€ë ¨ í•¨ìˆ˜
-	void PredictionPosition(int num, GLfloat time); // mean motion, E ë“±ì„ ì´ìš©í•˜ì—¬ ì¼ì •ì‹œê°„ ë’¤ì˜ ì„ íƒëœ ë¬¼ì²´ì˜ ìœ„ì¹˜ë¥¼ êµ¬í•˜ëŠ” í•¨ìˆ˜
-	void DrawPrediction(int num); // ì˜ˆì¸¡ ê·¹ì¢Œí‘œ ê²°ê³¼ë¥¼ ê·¸ë ¤ì£¼ëŠ” í•¨ìˆ˜
-	void CalculateT(int num); // ê·¼ì§€ì  í†µê³¼ì‹œë¥¼ êµ¬í•˜ëŠ” í•¨ìˆ˜ (ì´ˆ ë‹¨ìœ„)
-	void CreatPreCraft(int num); // ì˜ˆì¸¡ ë¬¼ì²´ì˜ ê°ì²´ë¥¼ ìƒì„±í•˜ëŠ” í•¨ìˆ˜
-	void unProject(CPoint point); // ìŠ¤í¬ë¦° ì¢Œí‘œë¥¼ ì›”ë“œì¢Œí‘œë¡œ ë³€í™˜
+	// ±Ëµµ ¿¹Ãø °ü·Ã ÇÔ¼ö
+	void PredictionPosition(int num, GLfloat time); // mean motion, E µîÀ» ÀÌ¿ëÇÏ¿© ÀÏÁ¤½Ã°£ µÚÀÇ ¼±ÅÃµÈ ¹°Ã¼ÀÇ À§Ä¡¸¦ ±¸ÇÏ´Â ÇÔ¼ö
+	void DrawPrediction(int num); // ¿¹Ãø ±ØÁÂÇ¥ °á°ú¸¦ ±×·ÁÁÖ´Â ÇÔ¼ö
+	void CalculateT(int num); // ±ÙÁöÁ¡ Åë°ú½Ã¸¦ ±¸ÇÏ´Â ÇÔ¼ö (ÃÊ ´ÜÀ§)
+	void CreatPreCraft(int num); // ¿¹Ãø ¹°Ã¼ÀÇ °´Ã¼¸¦ »ı¼ºÇÏ´Â ÇÔ¼ö
+	void unProject(CPoint point); // ½ºÅ©¸° ÁÂÇ¥¸¦ ¿ùµåÁÂÇ¥·Î º¯È¯
 
 protected:
 	bool InitContext(CWnd* parent);					 // Creates OpenGL Rendering Context
