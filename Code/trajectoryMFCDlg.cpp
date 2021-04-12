@@ -1,4 +1,4 @@
-﻿
+
 // trajectoryMFCDlg.cpp: 구현 파일
 //
 
@@ -214,7 +214,7 @@ void CtrajectoryMFCDlg::printInfo(int n)
 	CString str;
 
 	str.Format(_T("%f"), m_test->spaceCraft[n].P); // float -> CString
-	SetDlgItemText(IDC_EDIT0, str);
+	SetDlgItemText(IDC_EDIT_PERIOD, str);
 
 	str.Format(_T("%f"), m_test->spaceCraft[n].omega); // float -> CString
 	SetDlgItemText(IDC_EDIT1, str);
