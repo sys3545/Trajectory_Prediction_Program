@@ -373,7 +373,7 @@ void OPenGLRenderer::DrawSphere(int num)
 	CalculateT(num); // 근지점 통과시 업데이트
 	//// Update End ////
 
-	PredictionPosition(num, spaceCraft[num].preTime); // 예측 물체위치 계속 업데이트
+	PredictionPosition(num, spaceCraft[num].preTime); //
 }
 
 // 근지점 통과 시각을 구하는 함수
