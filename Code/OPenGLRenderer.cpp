@@ -169,7 +169,7 @@ int OPenGLRenderer::DrawGLScene()
 	glVertex3f(0.0, 0.0, -40.0);
 	glEnd();
 	glPopMatrix(); // 지구 중심좌표 제거
-
+	/*
 	glPushMatrix(); ////// 달 그리기 위한 좌표 추가  /////////
 	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //회전 변환 (z축) (달 공전) , 그리고 회전을 적용
@@ -183,7 +183,7 @@ int OPenGLRenderer::DrawGLScene()
 	glColor3f(0.7f, 0.7f, 0.7f);
 	gluSphere(moon, 0.32f, 12, 12);
 	glPopMatrix(); // 달 좌표 제거
-
+	
 	glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
@@ -197,8 +197,7 @@ int OPenGLRenderer::DrawGLScene()
 	}
 	glEnd();
 	glPopMatrix(); /////// 달 궤도 좌표 제거 ///////
-
-
+	*/
 	for (int n = 0; n <= numOfCraft; n++) {
 		if (spaceCraft[n].craft != NULL) {
 			glPushMatrix(); // 추가된 우주물체 궤도를 그리기 위한 좌표 추가
@@ -225,7 +224,6 @@ int OPenGLRenderer::DrawGLScene()
 			glPopMatrix(); // 예측 위치의 물체를 그리기 위한 좌표 제거
 		}
 	}
-	
 	glFlush();
 	
 	// 지구 자전 속도
@@ -502,13 +500,13 @@ void OPenGLRenderer::OnMouseMove(UINT nFlags, CPoint point)
 	GLfloat x;
 	
 	x = (GLfloat)point.x;
-	if (b_Rotate) {
+	if (b_Rotate) {  
 		differ = x - mousePoint;
 	}
 	mousePoint = x;
 	differ *= 40.0f; // 회전 민감도
 	zAngle += differ/100.0f;
-
+ 
 	if (zAngle > 359.0f || zAngle < -359.0f) zAngle = 0.0f;
 
 	CWnd::OnMouseMove(nFlags, point);
