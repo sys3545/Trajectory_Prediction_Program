@@ -1,4 +1,3 @@
-
 #include "pch.h"
 #include "OPenGLRenderer.h"
 
@@ -226,7 +225,7 @@ int OPenGLRenderer::DrawGLScene()
 	}
 	glFlush();
 	
-	// 지구 자전 속도
+	// 지구 자전 속도 ( 지구 정지궤도의 반지름 42705.97228 km, 속도 3.05475 km/s )
 	zrot += 360.0f / 87840.0f / timeScale;
 	if (zrot > 360.0f) {
 		zrot -= 360.0f;
@@ -371,7 +370,7 @@ void OPenGLRenderer::DrawSphere(int num)
 	CalculateT(num); // 근지점 통과시 업데이트
 	//// Update End ////
 
-	PredictionPosition(num, spaceCraft[num].preTime); //
+	PredictionPosition(num, spaceCraft[num].preTime); // 예측을 계속
 }
 
 // 근지점 통과 시각을 구하는 함수
@@ -402,7 +401,7 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 	GLfloat E[repeat]; // E0, E1, E2, E3
 	GLfloat deltaE;
 	GLfloat tanHalf_F;
-
+	
 	if (time >= spaceCraft[num].T)
 		spaceCraft[num].M = spaceCraft[num].n * (time - spaceCraft[num].T);
 	else
