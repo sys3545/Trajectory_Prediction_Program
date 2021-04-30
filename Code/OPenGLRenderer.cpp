@@ -1,3 +1,4 @@
+
 #include "pch.h"
 #include "OPenGLRenderer.h"
 
@@ -229,9 +230,9 @@ int OPenGLRenderer::DrawGLScene()
 	zrot += 360.0f / 87840.0f / timeScale;
 	if (zrot > 360.0f) {
 		zrot -= 360.0f;
-		currentTime = glutGet(GLUT_ELAPSED_TIME);
+		/*currentTime = glutGet(GLUT_ELAPSED_TIME);
 		deltaTime = currentTime - oldTime;
-		oldTime = currentTime;
+		oldTime = currentTime;*/
 	}
 
 	moon_zrot += 1.0f;
@@ -370,7 +371,7 @@ void OPenGLRenderer::DrawSphere(int num)
 	CalculateT(num); // 근지점 통과시 업데이트
 	//// Update End ////
 
-	PredictionPosition(num, spaceCraft[num].preTime); // 예측을 계속
+	PredictionPosition(num, spaceCraft[num].preTime); // 시간이 지날때마다 예측결과를 계속 업데이트
 }
 
 // 근지점 통과 시각을 구하는 함수
@@ -396,10 +397,11 @@ void OPenGLRenderer::CalculateT(int num)
 // 예측 극좌표를 구하는 함수
 void OPenGLRenderer::PredictionPosition(int num, GLfloat time) 
 {
-	const int repeat = 4;
+	const int repeat = 5;
 	GLfloat M[repeat]; // M0, M1, M2, M3 
 	GLfloat E[repeat]; // E0, E1, E2, E3
 	GLfloat deltaE;
+	GLfloat tanHalf_W;
 	GLfloat tanHalf_F;
 	
 	if (time >= spaceCraft[num].T)
@@ -407,21 +409,71 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 	else
 		spaceCraft[num].M = spaceCraft[num].n * (time + spaceCraft[num].P - spaceCraft[num].T);
 
-	E[0] = spaceCraft[num].M; // E0 = M0 근사
-	for (int i = 0; i < repeat; i++) {
-		M[i] = E[i] - (spaceCraft[num].e * sinf(E[i]));
-		deltaE = (spaceCraft[num].M - M[i]) / (1 - spaceCraft[num].e * cosf(E[0]));
-		
-		if(i < repeat-1)
-			E[i + 1] = E[i] + deltaE;
-	}
-	spaceCraft[num].M = M[repeat - 1];
-	spaceCraft[num].E = E[repeat - 1];
+	if (spaceCraft[num].type == 1) { // 타원궤도인 경우의 위치 예측 
 
-	spaceCraft[num].preRadius = spaceCraft[num].a * (1 - (spaceCraft[num].e * cosf(spaceCraft[num].E))); // r
-	tanHalf_F = sqrtf((1 + spaceCraft[num].e) / (1 - spaceCraft[num].e)) * tanf(spaceCraft[num].E / 2.0f); // tan(f/2)
-	spaceCraft[num].preF = 2.0f * atanf(tanHalf_F) * 180.0f / GL_PI; // f
-	
+		if (spaceCraft[num].e <= 0.7f) { // 이심률이 높지 않은 타원궤도
+			E[0] = spaceCraft[num].M; // E0 = M0 근사
+			for (int i = 0; i < repeat; i++) {
+				M[i] = E[i] - (spaceCraft[num].e * sinf(E[i]));
+				deltaE = (spaceCraft[num].M - M[i]) / (1 - spaceCraft[num].e * cosf(E[0]));
+
+				if (i < repeat - 1)
+					E[i + 1] = E[i] + deltaE;
+			}
+			spaceCraft[num].M = M[repeat - 1];
+			spaceCraft[num].E = E[repeat - 1];
+
+			spaceCraft[num].preRadius = spaceCraft[num].a * (1 - (spaceCraft[num].e * cosf(spaceCraft[num].E))); // r
+			tanHalf_F = sqrtf((1 + spaceCraft[num].e) / (1 - spaceCraft[num].e)) * tanf(spaceCraft[num].E / 2.0f); // tan(f/2)
+			spaceCraft[num].preF = 2.0f * atanf(tanHalf_F) * 180.0f / GL_PI; // f
+		}
+		else {  // 이심률이 높은 타원궤도 (Barker's equation 계산할 것)
+
+			if (time >= spaceCraft[num].T)
+				deltaTime = time - spaceCraft[num].T;
+			else
+				deltaTime = time + spaceCraft[num].P - spaceCraft[num].T;
+
+			q = spaceCraft[num].a * (1 - spaceCraft[num].e); // q 계산
+
+			for (int i = 0; i < repeat; i++) {
+				///// Barker's equation /////
+				cots = (3.0f / B) * sqrtf((float)(G * mass_Earth) / (2 * powf(q, 3))) * sqrtf((1 + 9 * spaceCraft[num].e) / 10.0f) * deltaTime;
+				s = atanf(1.0f / cots);
+				cotw = powf(1.0f / tanf(s / 2.0f), 1.0f / 3.0f);
+				cot2w = (powf(cotw, 2) - 1) / (2 * cotw);
+				tanHalf_W = 2 * cot2w;
+				A = 5.0f * (1 - spaceCraft[num].e) / (1 + 9 * spaceCraft[num].e) * powf(tanHalf_W, 2); // B와 barker 방정식으로 A를 구함
+
+				equationA = sqrtf(A) + ((1 + 9 * spaceCraft[num].e) / (1 - spaceCraft[num].e)) * powf(A, 1.5f) / 15.0f;
+				B = sqrtf((float)(G * mass_Earth * (1 - spaceCraft[num].e) / q)) * (deltaTime / (2.0f * q)); // 구한 A로 새로운 B를 구함
+			}
+			spaceCraft[num].y = A / (1 - 0.8f * A + (8.0f / 175.0f) * powf(A, 2.0f));
+			tanHalf_F = sqrtf(((1+ spaceCraft[num].e)/(1- spaceCraft[num].e))* spaceCraft[num].y); // tan(f/2)
+			spaceCraft[num].preRadius = (q * (1 + powf(tanHalf_F, 2))) / (1 + spaceCraft[num].y);
+			spaceCraft[num].preF = 2.0f * atanf(tanHalf_F) * 180.0f / GL_PI; // f
+		}
+	}
+
+	else { /////////////////////////////////////////// 쌍곡선 궤도인 경우의 위치 예측 ( 전체적인 수정 필요) /////////////////////////////////////////////
+		spaceCraft[num].n = sqrtf((float)(G * mass_Earth) / powf(spaceCraft[num].a * 1000.0f, 3.0f)); // 쌍곡선에서의 n 구하기
+
+		if (time >= spaceCraft[num].T)
+			spaceCraft[num].M = spaceCraft[num].n * (time - spaceCraft[num].T);
+		else
+			spaceCraft[num].M = spaceCraft[num].n * (time + spaceCraft[num].P - spaceCraft[num].T);
+
+		spaceCraft[num].F = 1;
+		for (int i = 0; i < 10; i++) { // 반복 처리 횟수 10번
+			spaceCraft[num].F = asinhf((float)(spaceCraft[num].F + spaceCraft[num].M) / spaceCraft[num].e);
+			spaceCraft[num].M = spaceCraft[num].e * sinhf(spaceCraft[num].F) - spaceCraft[num].F;
+		}
+
+		spaceCraft[num].preRadius = spaceCraft[num].a * (spaceCraft[num].e * coshf(spaceCraft[num].F) - 1); // r
+		tanHalf_F = sqrtf((spaceCraft[num].e + 1) / (spaceCraft[num].e - 1)) * tanf(spaceCraft[num].F / 2.0f); // tan(f/2)
+		spaceCraft[num].preF = 2.0f * atanf(tanHalf_F) * 180.0f / GL_PI; // f
+	}
+
 	if (spaceCraft[num].preF < 0) {
 		spaceCraft[num].preF = 360.0f + spaceCraft[num].preF;
 	}
@@ -456,26 +508,6 @@ void OPenGLRenderer::DrawPrediction(int num)
 	}
 }
 
-void OPenGLRenderer::unProject(CPoint point) {
-	int xCursor, yCursor;
-	GLdouble projection[16];
-	GLdouble modelView[16];
-	GLint viewPort[4];
-
-	xCursor = (int)point.x;
-	yCursor = (int)point.y;
-	glGetDoublev(GL_PROJECTION_MATRIX, projection);
-	glGetDoublev(GL_MODELVIEW_MATRIX, modelView);
-	glGetIntegerv(GL_VIEWPORT, viewPort);
-
-	GLfloat zCursor, winX, winY;
-	winX = (float)xCursor;
-	winY = (float)viewPort[3] - (float)yCursor;
-	glReadPixels((int)winX, (int)winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zCursor);
-	
-	gluUnProject(winX, winY, zCursor, modelView, projection, viewPort, &wx, &wy, &wz);
-}
-
 
 ///// user input functions /////
 void OPenGLRenderer::OnLButtonDown(UINT nFlags, CPoint point) // 클릭하면 클릭 시의 마우스 위치가 저장된다.
@@ -486,8 +518,6 @@ void OPenGLRenderer::OnLButtonDown(UINT nFlags, CPoint point) // 클릭하면 �
 	b_Rotate = TRUE; // 회전모드 시작
 	x = (GLfloat)point.x;
 	mousePoint = x;
-
-	unProject(point);
 
 	CWnd::OnLButtonDown(nFlags, point);
 }
