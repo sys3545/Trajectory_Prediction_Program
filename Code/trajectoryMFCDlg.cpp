@@ -236,6 +236,9 @@ void CtrajectoryMFCDlg::printInfo(int n)
 
 	str.Format(_T("%f"), m_test->spaceCraft[n].T); // float -> CString
 	SetDlgItemText(IDC_EDIT7, str);
+
+	str.Format(_T("%f"), m_test->s); // float -> CString
+	SetDlgItemText(IDC_EDIT_TEST, str);
 }
 
 void CtrajectoryMFCDlg::OnBnClickedButtonAdd() // ADD 버튼이 클릭되면
@@ -359,7 +362,7 @@ int CtrajectoryMFCDlg::CheckTrajShape(int n) {
 		return ellipse;
 }
 
-void CtrajectoryMFCDlg::CalculatePeriod(int n) {
+void CtrajectoryMFCDlg::CalculatePeriod(int n) { // 주기 P와 mean motion(n) 구하기.
 	double squareP = 0.0;
 
 	squareP = 4.0 * pow((double)m_test->GL_PI, 2) * pow((double)m_test->spaceCraft[n].a, 3);
