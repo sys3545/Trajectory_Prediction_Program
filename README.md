@@ -45,3 +45,7 @@ Screen rotation is perfect.
 Released version 0.1.6 (2021 04 09) :   
 Hyperbola orbit drawing is done.   
 Prediction position drawing is updated within everytime.   
+   
+Released version 0.1.7 (2021 04 30) :   
+Near parabolic orbit prediction was added, but it has a some ploblems.   
+   
