@@ -49,3 +49,6 @@ Prediction position drawing is updated within everytime.
 Released version 0.1.7 (2021 04 30) :   
 Near parabolic orbit prediction was added, but it has a some ploblems.   
    
+Released version 0.2.0 (2021 05 03) :   
+Hyperbolic orbit prediction is added. (Time problem must be solved)   
+   
