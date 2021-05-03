@@ -79,9 +79,10 @@ public:
 	int realTime = 1; // 실제시간과의 배속이 어느정도 인지 보여주는 변수
 
 	CString test; // 깃 데스크탑 테스트 //
-	GLfloat A = 0.0f, B = 1.0f;
+	GLfloat A = 0.0f, B;
 	GLfloat cots, s, cotw, cot2w, equationA;
 	GLfloat q; // 근지점 거리
+	GLfloat tanHalf_W;
 
 	// 텍스처 관련 변수
 	AUX_RGBImageRec* pTextureImage[1]; // 이미지 파일에 대한 정보를 가지고 있는 배열
