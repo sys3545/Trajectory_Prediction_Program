@@ -237,7 +237,7 @@ void CtrajectoryMFCDlg::printInfo(int n)
 	str.Format(_T("%f"), m_test->spaceCraft[n].T); // float -> CString
 	SetDlgItemText(IDC_EDIT7, str);
 
-	str.Format(_T("%f"), m_test->s); // float -> CString
+	str.Format(_T("%f"), m_test->spaceCraft[n].preRadius); // float -> CString
 	SetDlgItemText(IDC_EDIT_TEST, str);
 }
 
@@ -323,10 +323,10 @@ void CtrajectoryMFCDlg::CalculateAAndE(int n) { // a e p 구함
 	
 	m_test->spaceCraft[n].type = CheckTrajShape(n);
 	if (m_test->spaceCraft[n].type == 1) { // 타원궤도
-		reciprocal_a = (2.0 / (1000.0 * (double)(m_test->spaceCraft[n].range))) - ((double)pow(1000.0 * m_test->spaceCraft[n].velocity, 2) / GM);// 태양으로 임시설정(지구예제는 나중에) (km->m)
+		reciprocal_a = (2.0 / (1000.0 * (double)(m_test->spaceCraft[n].range))) - ((double)pow(1000.0 * m_test->spaceCraft[n].velocity, 2) / GM);//  (km->m)
 	}
 	else { // 쌍곡선궤도
-		reciprocal_a = ((double)pow(1000.0 * m_test->spaceCraft[n].velocity, 2) / GM) - (2.0 / (1000.0 * (double)(m_test->spaceCraft[n].range)));// 태양으로 임시설정(지구예제는 나중에) (km->m)
+		reciprocal_a = ((double)pow(1000.0 * m_test->spaceCraft[n].velocity, 2) / GM) - (2.0 / (1000.0 * (double)(m_test->spaceCraft[n].range)));//  (km->m)
 	}
 
 	m_test->spaceCraft[n].a = (GLfloat)(1.0 / reciprocal_a) / 1000.0f; // (m->km)
@@ -340,10 +340,10 @@ void CtrajectoryMFCDlg::CalculateAAndE(int n) { // a e p 구함
 	}
 	m_test->spaceCraft[n].e = (GLfloat)sqrt(square);
 
-	if (m_test->spaceCraft[n].type == 1) { // 타원궤도
+	if (m_test->spaceCraft[n].type == 1) { // 타원궤도 (반직현)
 		m_test->spaceCraft[n].p = m_test->spaceCraft[n].a * (1 - (GLfloat)pow(m_test->spaceCraft[n].e, 2));
 	}
-	else { // 쌍곡선궤도
+	else { // 쌍곡선궤도 (반직현)
 		m_test->spaceCraft[n].p = m_test->spaceCraft[n].a * ((GLfloat)pow(m_test->spaceCraft[n].e, 2) - 1);
 	}
 }
