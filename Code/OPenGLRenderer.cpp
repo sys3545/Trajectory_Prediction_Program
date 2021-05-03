@@ -400,18 +400,22 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 	const int repeat = 5;
 	GLfloat M[repeat]; // M0, M1, M2, M3 
 	GLfloat E[repeat]; // E0, E1, E2, E3
+	GLfloat F[repeat]; // F0, F1, F2, F3
 	GLfloat deltaE;
-	GLfloat tanHalf_W;
-	GLfloat tanHalf_F;
+	GLfloat deltaF;
 	
-	if (time >= spaceCraft[num].T)
-		spaceCraft[num].M = spaceCraft[num].n * (time - spaceCraft[num].T);
-	else
-		spaceCraft[num].M = spaceCraft[num].n * (time + spaceCraft[num].P - spaceCraft[num].T);
+	GLfloat tanHalf_F;
+	GLfloat GM = (float)G * mass_Earth;
 
+	if (time >= spaceCraft[num].T)
+		deltaTime = time - spaceCraft[num].T;
+	else
+		deltaTime = time + spaceCraft[num].P - spaceCraft[num].T;
+	
 	if (spaceCraft[num].type == 1) { // 타원궤도인 경우의 위치 예측 
 
 		if (spaceCraft[num].e <= 0.7f) { // 이심률이 높지 않은 타원궤도
+			spaceCraft[num].M = spaceCraft[num].n * deltaTime;
 			E[0] = spaceCraft[num].M; // E0 = M0 근사
 			for (int i = 0; i < repeat; i++) {
 				M[i] = E[i] - (spaceCraft[num].e * sinf(E[i]));
@@ -428,50 +432,53 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 			spaceCraft[num].preF = 2.0f * atanf(tanHalf_F) * 180.0f / GL_PI; // f
 		}
 		else {  // 이심률이 높은 타원궤도 (Barker's equation 계산할 것)
-
-			if (time >= spaceCraft[num].T)
-				deltaTime = time - spaceCraft[num].T;
-			else
-				deltaTime = time + spaceCraft[num].P - spaceCraft[num].T;
-
-			q = spaceCraft[num].a * (1 - spaceCraft[num].e); // q 계산
+			q = (spaceCraft[num].a * (1 - spaceCraft[num].e)) * 1000.0f; // q = a(1-e)
+			B = 1.0f;
 
 			for (int i = 0; i < repeat; i++) {
 				///// Barker's equation /////
 				cots = (3.0f / B) * sqrtf((float)(G * mass_Earth) / (2 * powf(q, 3))) * sqrtf((1 + 9 * spaceCraft[num].e) / 10.0f) * deltaTime;
-				s = atanf(1.0f / cots);
+				s = atanf(1.0f / cots); // s는 라디안
 				cotw = powf(1.0f / tanf(s / 2.0f), 1.0f / 3.0f);
 				cot2w = (powf(cotw, 2) - 1) / (2 * cotw);
 				tanHalf_W = 2 * cot2w;
 				A = 5.0f * (1 - spaceCraft[num].e) / (1 + 9 * spaceCraft[num].e) * powf(tanHalf_W, 2); // B와 barker 방정식으로 A를 구함
-
-				equationA = sqrtf(A) + ((1 + 9 * spaceCraft[num].e) / (1 - spaceCraft[num].e)) * powf(A, 1.5f) / 15.0f;
-				B = sqrtf((float)(G * mass_Earth * (1 - spaceCraft[num].e) / q)) * (deltaTime / (2.0f * q)); // 구한 A로 새로운 B를 구함
+				equationA = sqrtf(A) + ((1 + 9 * spaceCraft[num].e) / (1 - spaceCraft[num].e)) * (powf(A, 1.5f) / 15.0f);
+				B = (sqrtf(GM * (1 - spaceCraft[num].e)) * deltaTime) / (2 * powf(q, 1.5f) * equationA); // 구한 A로 새로운 B를 구함
 			}
+			
 			spaceCraft[num].y = A / (1 - 0.8f * A + (8.0f / 175.0f) * powf(A, 2.0f));
 			tanHalf_F = sqrtf(((1+ spaceCraft[num].e)/(1- spaceCraft[num].e))* spaceCraft[num].y); // tan(f/2)
+			//tanHalf_F = (5.0f * (1 - spaceCraft[num].e) / (1 + 9 * spaceCraft[num].e))/ (1 - 0.8f * A + (8.0f / 175.0f)) * powf(tanHalf_W, 2);
 			spaceCraft[num].preRadius = (q * (1 + powf(tanHalf_F, 2))) / (1 + spaceCraft[num].y);
+			spaceCraft[num].preRadius /= 1000.0f;
 			spaceCraft[num].preF = 2.0f * atanf(tanHalf_F) * 180.0f / GL_PI; // f
+			
 		}
 	}
 
-	else { /////////////////////////////////////////// 쌍곡선 궤도인 경우의 위치 예측 ( 전체적인 수정 필요) /////////////////////////////////////////////
+	else { /////////////////////////////////////////// 쌍곡선 궤도인 경우의 위치 예측 ( 시간관련 수정필요 - 나머지 완벽) /////////////////////////////////////////////
+		// t - T를 받은 값 그대로 이용하여 근지점 통과 후 그 시간의 위치를 바로 예측해보자.
 		spaceCraft[num].n = sqrtf((float)(G * mass_Earth) / powf(spaceCraft[num].a * 1000.0f, 3.0f)); // 쌍곡선에서의 n 구하기
+		spaceCraft[num].M = spaceCraft[num].n * deltaTime;
 
-		if (time >= spaceCraft[num].T)
-			spaceCraft[num].M = spaceCraft[num].n * (time - spaceCraft[num].T);
-		else
-			spaceCraft[num].M = spaceCraft[num].n * (time + spaceCraft[num].P - spaceCraft[num].T);
-
-		spaceCraft[num].F = 1;
-		for (int i = 0; i < 10; i++) { // 반복 처리 횟수 10번
-			spaceCraft[num].F = asinhf((float)(spaceCraft[num].F + spaceCraft[num].M) / spaceCraft[num].e);
-			spaceCraft[num].M = spaceCraft[num].e * sinhf(spaceCraft[num].F) - spaceCraft[num].F;
+		F[0] = spaceCraft[num].M;
+		for (int i = 0; i < 20; i++) { // 반복 처리 횟수 20번 - F0 을 구한다.
+			F[0] = asinhf((float)(F[0] + spaceCraft[num].M) / spaceCraft[num].e);
 		}
+		for (int i = 0; i < repeat; i++) { // 최종 F와 M을 구하는 반복 절차
+			M[i] = spaceCraft[num].e * sinhf(F[i]) - F[i];
+			deltaF = (spaceCraft[num].M - M[i]) / (spaceCraft[num].e * coshf(F[0]) - 1);
 
-		spaceCraft[num].preRadius = spaceCraft[num].a * (spaceCraft[num].e * coshf(spaceCraft[num].F) - 1); // r
+			if (i < repeat - 1)
+				F[i + 1] = F[i] + deltaF;
+		}
+		spaceCraft[num].M = M[repeat - 1];
+		spaceCraft[num].F = F[repeat - 1];
+
 		tanHalf_F = sqrtf((spaceCraft[num].e + 1) / (spaceCraft[num].e - 1)) * tanf(spaceCraft[num].F / 2.0f); // tan(f/2)
 		spaceCraft[num].preF = 2.0f * atanf(tanHalf_F) * 180.0f / GL_PI; // f
+		spaceCraft[num].preRadius = (spaceCraft[num].a * (powf(spaceCraft[num].e, 2) - 1)) / (1 + spaceCraft[num].e * cosf(spaceCraft[num].preF * GL_PI / 180.0f));
 	}
 
 	if (spaceCraft[num].preF < 0) {
