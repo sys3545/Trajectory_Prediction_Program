@@ -415,7 +415,7 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 	if (spaceCraft[num].type == 1) { // 타원궤도인 경우의 위치 예측 
 
 		if (spaceCraft[num].e <= 0.7f) { // 이심률이 높지 않은 타원궤도
-			spaceCraft[num].M = spaceCraft[num].n * deltaTime;
+			spaceCraft[num].M = spaceCraft[num].n * time; // time -> deltaTime으로 바꾸면 현재 위치 기준 예측가능
 			E[0] = spaceCraft[num].M; // E0 = M0 근사
 			for (int i = 0; i < repeat; i++) {
 				M[i] = E[i] - (spaceCraft[num].e * sinf(E[i]));
@@ -437,14 +437,14 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 
 			for (int i = 0; i < repeat; i++) {
 				///// Barker's equation /////
-				cots = (3.0f / B) * sqrtf((float)(G * mass_Earth) / (2 * powf(q, 3))) * sqrtf((1 + 9 * spaceCraft[num].e) / 10.0f) * deltaTime;
+				cots = (3.0f / B) * sqrtf((float)(G * mass_Earth) / (2 * powf(q, 3))) * sqrtf((1 + 9 * spaceCraft[num].e) / 10.0f) * time;
 				s = atanf(1.0f / cots); // s는 라디안
 				cotw = powf(1.0f / tanf(s / 2.0f), 1.0f / 3.0f);
 				cot2w = (powf(cotw, 2) - 1) / (2 * cotw);
 				tanHalf_W = 2 * cot2w;
 				A = 5.0f * (1 - spaceCraft[num].e) / (1 + 9 * spaceCraft[num].e) * powf(tanHalf_W, 2); // B와 barker 방정식으로 A를 구함
 				equationA = sqrtf(A) + ((1 + 9 * spaceCraft[num].e) / (1 - spaceCraft[num].e)) * (powf(A, 1.5f) / 15.0f);
-				B = (sqrtf(GM * (1 - spaceCraft[num].e)) * deltaTime) / (2 * powf(q, 1.5f) * equationA); // 구한 A로 새로운 B를 구함
+				B = (sqrtf(GM * (1 - spaceCraft[num].e)) * time) / (2 * powf(q, 1.5f) * equationA); // 구한 A로 새로운 B를 구함
 			}
 			
 			spaceCraft[num].y = A / (1 - 0.8f * A + (8.0f / 175.0f) * powf(A, 2.0f));
@@ -457,10 +457,10 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 		}
 	}
 
-	else { /////////////////////////////////////////// 쌍곡선 궤도인 경우의 위치 예측 ( 시간관련 수정필요 - 나머지 완벽) /////////////////////////////////////////////
-		// t - T를 받은 값 그대로 이용하여 근지점 통과 후 그 시간의 위치를 바로 예측해보자.
+	else { /////////////////////////////////////////// 쌍곡선 궤도인 경우의 위치 예측 ( 근지점 통과시간 관련 수정필요 - 나머지 완벽) /////////////////////////////////////////////
+		// t - T를 받은 값 그대로 이용하여 근지점 통과 후 그 시간의 위치를 바로 예측해보자. (성공)
 		spaceCraft[num].n = sqrtf((float)(G * mass_Earth) / powf(spaceCraft[num].a * 1000.0f, 3.0f)); // 쌍곡선에서의 n 구하기
-		spaceCraft[num].M = spaceCraft[num].n * deltaTime;
+		spaceCraft[num].M = spaceCraft[num].n * time;
 
 		F[0] = spaceCraft[num].M;
 		for (int i = 0; i < 20; i++) { // 반복 처리 횟수 20번 - F0 을 구한다.
