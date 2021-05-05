@@ -57,6 +57,7 @@ public:
 
 	// 달의 성분
 	GLfloat		radius_Moon = 1.737f; // 달 반지름
+	GLfloat		dist_Moon = 128.13f; // 지구에서 달까지 거리 384,400km ( 너무 멀어서 좀 가까이에 지정해줌  )
 	GLfloat		moon_zrot = 0.0f; // 달 공전 각도
 	GLfloat		moon_xpos = 0.0f;
 	GLfloat		moon_ypos = 0.0f;
