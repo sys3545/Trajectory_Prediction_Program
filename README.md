@@ -53,4 +53,6 @@ Released version 0.2.0 (2021 05 03) :
 Hyperbolic orbit prediction was added. (Time problem must be solved)   
    
 Released version 0.2.1 (2021 05 05) :   
-Real-scale Moon was added.
+Real-scale Moon was added, and texture mapping is complete.   
+   
+   
