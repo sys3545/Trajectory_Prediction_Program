@@ -118,8 +118,8 @@ void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 	glEnable(GL_DEPTH_TEST); // 깊이 버퍼를 사용할 것을 알림
 
 	zoom = -30.0f; // 초기 줌 정도 설정
-	earth = gluNewQuadric(); // 지구 객체 인스턴스 생성
-	moon = gluNewQuadric(); // 달 객체 인스턴스 생성
+	//earth = gluNewQuadric(); // 지구 객체 인스턴스 생성
+	//moon = gluNewQuadric(); // 달 객체 인스턴스 생성
 	LoadGLTextures();
 
 	oldTime = glutGet(GLUT_ELAPSED_TIME); //oldTime 값은 초기화과정 맨 마지막에 적용
@@ -236,7 +236,7 @@ int OPenGLRenderer::DrawGLScene()
 	}
 
 	// 달 공전 속도
-	moon_zrot += 360.0f / 87840.0f / timeScale;
+	moon_zrot += 360.0f / (87840.0f * 27.0f) / timeScale;
 	if (moon_zrot > 360.0f) {
 		moon_zrot -= 360.0f;
 	}
@@ -278,27 +278,40 @@ AUX_RGBImageRec* OPenGLRenderer::LoadBMPFile(char* filename)
 int OPenGLRenderer::LoadGLTextures()
 {
 	int Status = FALSE;
+	earth = gluNewQuadric(); // 지구 객체 인스턴스 생성
+	moon = gluNewQuadric(); // 달 객체 인스턴스 생성
 
 	gluQuadricTexture(earth, GL_TRUE); // 텍스처 매핑 사용
+	gluQuadricTexture(moon, GL_TRUE); // 텍스처 매핑 사용
 	memset(pTextureImage, 0, sizeof(void*) * 1); // 포인터 초기화
 
-	if (pTextureImage[0] = LoadBMPFile("earth.bmp")) {
+	if ((pTextureImage[0] = LoadBMPFile("earth.bmp"))) {
 		Status = TRUE;
-		glGenTextures(1, &textureID[0]); // 텍스쳐 객체 생성
+		glGenTextures(0, &textureID[0]); // 텍스쳐 객체 생성
 		glBindTexture(GL_TEXTURE_2D, textureID[0]); // 상태관리자에게 [0]번째 텍스처를 바인딩
 		glTexImage2D(GL_TEXTURE_2D, 0, 3, pTextureImage[0]->sizeX, pTextureImage[0]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[0]->data);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // 이미지 파일과 물체의 크기를 맞춰준다
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glEnable(GL_TEXTURE_2D);
+
+		/*glGenTextures(1, &textureID[1]); // 텍스쳐 객체 생성
+		glBindTexture(GL_TEXTURE_2D, textureID[1]); // 상태관리자에게 [1]번째 텍스처를 바인딩
+		glTexImage2D(GL_TEXTURE_2D, 0, 3, pTextureImage[1]->sizeX, pTextureImage[1]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[1]->data);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // 이미지 파일과 물체의 크기를 맞춰준다
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glEnable(GL_TEXTURE_2D);*/
 	}
 
 	//텍스처 공간반납
-	if (pTextureImage[0]) {
-		if (pTextureImage[0]->data) {
-			free(pTextureImage[0]->data);
+	for (int i = 0; i < 1; i++) {
+		if (pTextureImage[i]) {
+			if (pTextureImage[i]->data) {
+				free(pTextureImage[i]->data);
+			}
+			free(pTextureImage[i]);
 		}
-		free(pTextureImage[0]);
 	}
+
 	return Status;
 }
 
@@ -457,7 +470,7 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 		}
 	}
 
-	else { /////////////////////////////////////////// 쌍곡선 궤도인 경우의 위치 예측 ( 근지점 통과시간 관련 수정필요 - 나머지 완벽) /////////////////////////////////////////////
+	else { // 쌍곡선 궤도인 경우의 위치 예측 
 		// t - T를 받은 값 그대로 이용하여 근지점 통과 후 그 시간의 위치를 바로 예측해보자.
 		spaceCraft[num].n = sqrtf((float)(G * mass_Earth) / powf(spaceCraft[num].a * 1000.0f, 3.0f)); // 쌍곡선에서의 n 구하기
 		spaceCraft[num].M = spaceCraft[num].n * time;
