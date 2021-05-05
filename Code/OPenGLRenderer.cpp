@@ -1,4 +1,3 @@
-
 #include "pch.h"
 #include "OPenGLRenderer.h"
 
@@ -115,7 +114,7 @@ void OPenGLRenderer::PrepareScene(int sx, int sy, int cx, int cy)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
+	
 	glEnable(GL_DEPTH_TEST); // 깊이 버퍼를 사용할 것을 알림
 
 	zoom = -30.0f; // 초기 줌 정도 설정
@@ -147,20 +146,20 @@ int OPenGLRenderer::DrawGLScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 버퍼 비트 클리어 (고정)
 	glLoadIdentity(); // (고정)
 	glTranslatef(0.0f, 0.0f, zoom); //원점의 이동
-	glRotatef(zAngle, 0.0f, 1.0f, 0.0f); // z축을 기준으로 좌표축 회전(화면 회전용)
+	glRotatef(zAngle, 0.0f, 1.0f, 0.0f); // z축을 기준으로 좌표축 회전(마우스 입력 - 화면 회전용)
 
 	////draw Earth
 	glPushMatrix(); // 지구중심좌표 추가
 	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 자전축 맞추기용 )
 	
-	glRotatef(zrot, 0.0f, 0.0f, 1.0f); //회전 변환 (z축) (지구 자전)
+	glRotatef(earth_zrot, 0.0f, 0.0f, 1.0f); //회전 변환 (z축) (지구 자전)
 	gluQuadricDrawStyle(earth, GLU_FILL); // 객체를 채우는 형태로 설정
 	glColor3f(1.0f, 1.0f, 1.0f); // 색 지정
 	gluSphere(earth, radius_Earth, 24, 24); // 구를 그림
 
 	gluQuadricDrawStyle(earth, GLU_LINE); // 선을 긋는 형태로 설정
 	glColor3f(0.2f, 0.2f, 1.0f); // 색 지정
-	gluSphere(earth, radius_Earth + (GLfloat)0.05f, 24, 24); // 구를 그림
+	gluSphere(earth, radius_Earth + 0.05f, 24, 24); // 구를 그림
 
 	// Blue coordinate (z축 좌표)
 	glColor3f(0, 0, 1);
@@ -169,21 +168,21 @@ int OPenGLRenderer::DrawGLScene()
 	glVertex3f(0.0, 0.0, -40.0);
 	glEnd();
 	glPopMatrix(); // 지구 중심좌표 제거
-	/*
+	
 	glPushMatrix(); ////// 달 그리기 위한 좌표 추가  /////////
-	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
+	glRotatef(5.145f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //회전 변환 (z축) (달 공전) , 그리고 회전을 적용
-	glTranslatef(7.0f, 0.0f, 0.0f); // 지구와의 거리만큼 x축에서 이동
+	glTranslatef(384.4f, 0.0f, 0.0f); // 지구와의 거리만큼 x축에서 이동
 	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
 
 	gluQuadricDrawStyle(moon, GLU_FILL); // 객체를 채우는 형태로 설정
 	glColor3f(0.35f, 0.35f, 0.35f);
-	gluSphere(moon, 0.3f, 12, 12);
+	gluSphere(moon, radius_Moon, 12, 12);
 	gluQuadricDrawStyle(moon, GLU_LINE); // 선을 긋는 형태로 설정
 	glColor3f(0.7f, 0.7f, 0.7f);
-	gluSphere(moon, 0.32f, 12, 12);
+	gluSphere(moon, radius_Moon +0.02f, 12, 12);
 	glPopMatrix(); // 달 좌표 제거
-	
+	/*
 	glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
@@ -198,6 +197,7 @@ int OPenGLRenderer::DrawGLScene()
 	glEnd();
 	glPopMatrix(); /////// 달 궤도 좌표 제거 ///////
 	*/
+	
 	for (int n = 0; n <= numOfCraft; n++) {
 		if (spaceCraft[n].craft != NULL) {
 			glPushMatrix(); // 추가된 우주물체 궤도를 그리기 위한 좌표 추가
@@ -227,17 +227,18 @@ int OPenGLRenderer::DrawGLScene()
 	glFlush();
 	
 	// 지구 자전 속도 ( 지구 정지궤도의 반지름 42705.97228 km, 속도 3.05475 km/s )
-	zrot += 360.0f / 87840.0f / timeScale;
-	if (zrot > 360.0f) {
-		zrot -= 360.0f;
+	earth_zrot += 360.0f / 87840.0f / timeScale;
+	if (earth_zrot > 360.0f) {
+		earth_zrot -= 360.0f;
 		/*currentTime = glutGet(GLUT_ELAPSED_TIME);
 		deltaTime = currentTime - oldTime;
 		oldTime = currentTime;*/
 	}
 
-	moon_zrot += 1.0f;
-	if (moon_zrot > 359.0f) {
-		moon_zrot = 0.0f;
+	// 달 공전 속도
+	moon_zrot += 360.0f / 87840.0f / timeScale;
+	if (moon_zrot > 360.0f) {
+		moon_zrot -= 360.0f;
 	}
 
 	return TRUE;
@@ -285,8 +286,7 @@ int OPenGLRenderer::LoadGLTextures()
 		Status = TRUE;
 		glGenTextures(1, &textureID[0]); // 텍스쳐 객체 생성
 		glBindTexture(GL_TEXTURE_2D, textureID[0]); // 상태관리자에게 [0]번째 텍스처를 바인딩
-		glTexImage2D(GL_TEXTURE_2D, 0, 3, pTextureImage[0]->sizeX, pTextureImage[0]->sizeY, 0,
-			GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[0]->data);
+		glTexImage2D(GL_TEXTURE_2D, 0, 3, pTextureImage[0]->sizeX, pTextureImage[0]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[0]->data);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // 이미지 파일과 물체의 크기를 맞춰준다
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glEnable(GL_TEXTURE_2D);
@@ -458,7 +458,7 @@ void OPenGLRenderer::PredictionPosition(int num, GLfloat time)
 	}
 
 	else { /////////////////////////////////////////// 쌍곡선 궤도인 경우의 위치 예측 ( 근지점 통과시간 관련 수정필요 - 나머지 완벽) /////////////////////////////////////////////
-		// t - T를 받은 값 그대로 이용하여 근지점 통과 후 그 시간의 위치를 바로 예측해보자. (성공)
+		// t - T를 받은 값 그대로 이용하여 근지점 통과 후 그 시간의 위치를 바로 예측해보자.
 		spaceCraft[num].n = sqrtf((float)(G * mass_Earth) / powf(spaceCraft[num].a * 1000.0f, 3.0f)); // 쌍곡선에서의 n 구하기
 		spaceCraft[num].M = spaceCraft[num].n * time;
 
