@@ -149,54 +149,58 @@ int OPenGLRenderer::DrawGLScene()
 	glRotatef(zAngle, 0.0f, 1.0f, 0.0f); // z축을 기준으로 좌표축 회전(마우스 입력 - 화면 회전용)
 
 	////draw Earth
-	glPushMatrix(); // 지구중심좌표 추가
+	glPushMatrix(); ///// 지구중심좌표 추가 //////
 	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 자전축 맞추기용 )
 	
 	glRotatef(earth_zrot, 0.0f, 0.0f, 1.0f); //회전 변환 (z축) (지구 자전)
 	gluQuadricDrawStyle(earth, GLU_FILL); // 객체를 채우는 형태로 설정
 	glColor3f(1.0f, 1.0f, 1.0f); // 색 지정
+	glBindTexture(GL_TEXTURE_2D, textureID[0]); // 텍스처와 객체 연결
 	gluSphere(earth, radius_Earth, 24, 24); // 구를 그림
 
 	gluQuadricDrawStyle(earth, GLU_LINE); // 선을 긋는 형태로 설정
-	glColor3f(0.2f, 0.2f, 1.0f); // 색 지정
+	glColor3f(0.7f, 0.7f, 1.0f); // 색 지정
 	gluSphere(earth, radius_Earth + 0.05f, 24, 24); // 구를 그림
 
 	// Blue coordinate (z축 좌표)
 	glColor3f(0, 0, 1);
 	glBegin(GL_LINE_LOOP);
-	glVertex3f(0.0, 0.0, 40.0);
-	glVertex3f(0.0, 0.0, -40.0);
+	glVertex3f(0.0, 0.0, 80.0);
+	glVertex3f(0.0, 0.0, -80.0);
 	glEnd();
 	glPopMatrix(); // 지구 중심좌표 제거
 	
 	glPushMatrix(); ////// 달 그리기 위한 좌표 추가  /////////
 	glRotatef(5.145f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
 	glRotatef(moon_zrot, 0.0f, 1.0f, 0.0f); //회전 변환 (z축) (달 공전) , 그리고 회전을 적용
-	glTranslatef(384.4f, 0.0f, 0.0f); // 지구와의 거리만큼 x축에서 이동
+	glTranslatef(dist_Moon, 0.0f, 0.0f); // 지구와의 거리만큼 x축에서 이동
 	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 회전축 맞추기용 )
 
 	gluQuadricDrawStyle(moon, GLU_FILL); // 객체를 채우는 형태로 설정
-	glColor3f(0.35f, 0.35f, 0.35f);
-	gluSphere(moon, radius_Moon, 12, 12);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glBindTexture(GL_TEXTURE_2D, textureID[1]); // 텍스처와 객체 연결
+	gluSphere(moon, radius_Moon, 24, 24);
 	gluQuadricDrawStyle(moon, GLU_LINE); // 선을 긋는 형태로 설정
 	glColor3f(0.7f, 0.7f, 0.7f);
-	gluSphere(moon, radius_Moon +0.02f, 12, 12);
+	gluSphere(moon, radius_Moon +0.02f, 16, 16);
 	glPopMatrix(); // 달 좌표 제거
-	/*
-	glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glRotatef(20.0f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
-	glBegin(GL_POINTS);
-	for (GLfloat angle = 0; angle < 360; angle += 0.1f)
-	{
-		moon_xpos = (GLfloat)cos(angle) * 7.0f;
-		moon_ypos = (GLfloat)sin(angle) * 7.0f;
-		glVertex3f(moon_xpos, moon_ypos, moon_zpos);
+
+	if(zoom < - 90.0f){ // 줌아웃을 어느 정도했을 때 달 궤도가 보임
+		glPushMatrix();// 달 궤도를 그리기 위한 좌표 추가
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glRotatef(5.145f, 0.0f, 0.0f, 1.0f); // z축을 기준으로 좌표축 20도 회전( 궤도면 회전 )
+		glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // x축을 기준으로 좌표축 -90도 회전( 좌표축 맞추기용 )
+		glColor3f(0.7f, 0.7f, 0.7f);
+		glBegin(GL_POINTS);
+		for (GLfloat angle = 0; angle < 360; angle += 0.1f)
+		{
+			moon_xpos = (GLfloat)cos(angle) * dist_Moon;
+			moon_ypos = (GLfloat)sin(angle) * dist_Moon;
+			glVertex3f(moon_xpos, moon_ypos, moon_zpos);
+		}
+		glEnd();
+		glPopMatrix(); /////// 달 궤도 좌표 제거 ///////
 	}
-	glEnd();
-	glPopMatrix(); /////// 달 궤도 좌표 제거 ///////
-	*/
 	
 	for (int n = 0; n <= numOfCraft; n++) {
 		if (spaceCraft[n].craft != NULL) {
@@ -285,25 +289,24 @@ int OPenGLRenderer::LoadGLTextures()
 	gluQuadricTexture(moon, GL_TRUE); // 텍스처 매핑 사용
 	memset(pTextureImage, 0, sizeof(void*) * 1); // 포인터 초기화
 
-	if ((pTextureImage[0] = LoadBMPFile("earth.bmp"))) {
+	if ((pTextureImage[0] = LoadBMPFile("earth.bmp"))&& (pTextureImage[1] = LoadBMPFile("moon2.bmp"))) {
 		Status = TRUE;
-		glGenTextures(0, &textureID[0]); // 텍스쳐 객체 생성
+		glGenTextures(2, &textureID[0]); // 텍스쳐 객체 생성
 		glBindTexture(GL_TEXTURE_2D, textureID[0]); // 상태관리자에게 [0]번째 텍스처를 바인딩
 		glTexImage2D(GL_TEXTURE_2D, 0, 3, pTextureImage[0]->sizeX, pTextureImage[0]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[0]->data);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // 이미지 파일과 물체의 크기를 맞춰준다
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glEnable(GL_TEXTURE_2D);
 
-		/*glGenTextures(1, &textureID[1]); // 텍스쳐 객체 생성
 		glBindTexture(GL_TEXTURE_2D, textureID[1]); // 상태관리자에게 [1]번째 텍스처를 바인딩
 		glTexImage2D(GL_TEXTURE_2D, 0, 3, pTextureImage[1]->sizeX, pTextureImage[1]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[1]->data);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // 이미지 파일과 물체의 크기를 맞춰준다
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glEnable(GL_TEXTURE_2D);*/
+		glEnable(GL_TEXTURE_2D);
 	}
 
 	//텍스처 공간반납
-	for (int i = 0; i < 1; i++) {
+	for (int i = 0; i < 2; i++) {
 		if (pTextureImage[i]) {
 			if (pTextureImage[i]->data) {
 				free(pTextureImage[i]->data);
@@ -579,8 +582,8 @@ BOOL OPenGLRenderer::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) // 화�
 
 	zoom += temp_zoom;
 
-	if (zoom < -80.0f) zoom = -80.0f;
-	if (zoom > -20.0f) zoom = -20.0f;
+	if (zoom < -150.0f) zoom = -150.0f; // 줌아웃 최대치
+	if (zoom > -20.0f) zoom = -20.0f; // 줌인 최대치
 
 	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
 }
