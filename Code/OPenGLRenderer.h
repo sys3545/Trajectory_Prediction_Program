@@ -87,8 +87,8 @@ public:
 	GLfloat tanHalf_W;
 
 	// 텍스처 관련 변수
-	AUX_RGBImageRec* pTextureImage[1]; // 이미지 파일에 대한 정보를 가지고 있는 배열
-	GLuint textureID[1]; // 텍스처의 핸들을 저장하는 배열
+	AUX_RGBImageRec* pTextureImage[2]; // 이미지 파일에 대한 정보를 가지고 있는 배열
+	GLuint textureID[2]; // 텍스처의 핸들을 저장하는 배열
 
 	// 마우스 입력시 회전 변수
 	BOOL b_Rotate = FALSE; // 마우스 상태에 따른 회전을 감지
