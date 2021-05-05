@@ -49,16 +49,18 @@ public:
 
 public:
 	// 지구의 성분
-	GLfloat		zrot = 0; // 지구 자전 속도
+	GLfloat		earth_zrot = 0; // 지구 자전 각도
 	GLfloat     radius_Earth = 6.378f; ////////// 1.0f = 1000km //////////
 	GLfloat     mass_Earth = (GLfloat)5.972 * (GLfloat)pow(10, 24); // kg
 	double      G = 6.673 * pow(10, -11); // m^3/kg/s^2 (중력상수)
 
-	// 달 회전 성분
-	GLfloat		moon_zrot = 0; // 달 공전 속도
-	GLfloat		moon_xpos = 7.0f; // 지구와 달거리
-	GLfloat		moon_ypos = 0;
-	GLfloat		moon_zpos = 0;
+
+	// 달의 성분
+	GLfloat		radius_Moon = 1.737f; // 달 반지름
+	GLfloat		moon_zrot = 0.0f; // 달 공전 각도
+	GLfloat		moon_xpos = 0.0f;
+	GLfloat		moon_ypos = 0.0f;
+	GLfloat		moon_zpos = 0.0f;
 
 	GLUquadricObj* earth = NULL; // 지구 객체
 	GLUquadricObj* moon = NULL; // 달 객체
