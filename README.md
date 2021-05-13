@@ -2,7 +2,7 @@
 The repository for Trajectory Prediction program in Two-Body Problem 
    
 # Example Screen (version 0.1.6)   
-![ezgif com-gif-maker](https://user-images.githubusercontent.com/61923882/114961004-24d92300-9ea3-11eb-82d5-fc9181c0e731.gif)
+![궤도예측시작](https://user-images.githubusercontent.com/61923882/118082038-753a9680-b3f7-11eb-9b27-48d704f450bd.gif)
 
 # Versions
 Released version 0.0.1 (2021 03 05) :   
